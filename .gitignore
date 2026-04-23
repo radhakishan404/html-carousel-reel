@@ -10,6 +10,7 @@ output/playwright/
 *_reel.mp4
 *_reel_test.mp4
 html-carousel/*_reel.mp4
+!html-carousel/create_html_to_reel_carousel_reel.mp4
 
 # macOS
 .DS_Store

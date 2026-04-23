@@ -1,117 +1,174 @@
 # HTML Carousel Reel
 
-Open-source local tool to convert HTML carousel slides into motion-designed vertical reel videos (`.mp4`) using [HyperFrames](https://github.com/heygen-com/hyperframes).
+Convert a static HTML carousel into a vertical reel video on your own machine.
 
-No paid API required. Runs on your machine.
+This repo takes a `.html` file with `.slide` sections, compiles it into a [HyperFrames](https://github.com/heygen-com/hyperframes) composition, adds motion, counters, staggered reveals, glow, and pacing, then exports a final `.mp4`.
 
-## Features
+No paid video API. No hosted render dependency. Just HTML in, reel out.
 
-- HTML carousel -> reel video (`mp4`)
-- Automatic motion design per slide:
-  - line/word reveals
-  - staggered card/block entries
-  - number counter animation
-  - accent/progress bar growth
-  - glow/light sweeps
-- Prompt-based style tuning (`--prompt`)
-- Batch render all HTML files in a folder
+## Demo
 
-## Requirements
+**Sample reel:** [`create_html_to_reel_carousel_reel.mp4`](./html-carousel/create_html_to_reel_carousel_reel.mp4)
 
-- Node.js `22+`
-- FFmpeg installed on `PATH`
-- macOS/Linux/Windows (with Node + FFmpeg)
+Click the preview below to open the MP4 from the repo:
+
+[![Demo reel preview](./docs/demo/demo-hero.png)](./html-carousel/create_html_to_reel_carousel_reel.mp4)
+
+More demo frames:
+
+| Build flow | Creator slide | Final CTA |
+| --- | --- | --- |
+| ![Build flow](./docs/demo/demo-flow.png) | ![Creator slide](./docs/demo/demo-creator.png) | ![Final CTA](./docs/demo/demo-cta.png) |
+
+## What This Repo Does
+
+- Converts HTML carousel slides into vertical MP4 reels
+- Adds animation per slide instead of doing a flat screen recording
+- Supports prompt-driven motion styling like `cinematic`, `smooth`, `fast`, `clean`, `glow`
+- Exports locally beside the source HTML file
+- Works well for creator reels, product explainers, launch videos, and carousel-to-video repurposing
+
+## How It Works
+
+1. You create an HTML carousel file with `.slide` sections.
+2. This repo detects the slides and builds a temporary HyperFrames composition.
+3. It injects motion timelines for text, cards, counters, icons, bars, and ambient light.
+4. HyperFrames renders the final reel locally.
+5. The MP4 is saved next to the source HTML.
 
 ## Quick Start
 
+### Requirements
+
+- Node.js `20+`
+- `ffmpeg` on `PATH`
+- macOS, Linux, or Windows with Node + FFmpeg
+
+### Install
+
 ```bash
-# 1) Clone
-git clone <your-github-repo-url>
+git clone https://github.com/radhakishan404/html-carousel-reel.git
 cd html-carousel-reel
-
-# 2) Install
 npm install
-
-# 3) Render one file
-./render-reel ./html-carousel/ai_coding_agents_signal_carousel.html
 ```
 
-Output is saved next to the source file:
+### Render One Reel
+
+```bash
+./render-reel ./html-carousel/create_html_to_reel_carousel.html \
+  --prompt "smooth, cinematic, storytelling" \
+  --quality standard
+```
+
+Output:
 
 ```text
-html-carousel/ai_coding_agents_signal_carousel_reel.mp4
+html-carousel/create_html_to_reel_carousel_reel.mp4
 ```
 
-## Prompt-driven style
+## Input Format
 
-You can tune animation style with natural language:
+Your source HTML should contain top-level `.slide` blocks.
+
+Example structure:
+
+```html
+<section class="slide">
+  <h1>Hook</h1>
+  <p>One clear idea per slide.</p>
+</section>
+<section class="slide">
+  <h2>Proof</h2>
+  <div class="stat-card">...</div>
+</section>
+```
+
+Tips for better reel output:
+
+- Keep one message per slide
+- Use short lines and strong hierarchy
+- Prefer large text and obvious contrast
+- Use grouped cards, counters, lists, or flow blocks
+- Build for `9:16` instead of desktop layouts
+
+## Prompt-Driven Style
+
+You can steer motion behavior with plain-English prompts:
 
 ```bash
 ./render-reel ./html-carousel/github_repos_for_claude_code_carousel.html \
-  --prompt "cinematic neon, bold, fast" \
-  --seconds-per-slide 3.4
+  --prompt "cinematic, glow, smooth, premium" \
+  --seconds-per-slide 4.8
 ```
 
-Supported style intents include keywords like:
-- `cinematic`, `epic`, `movie`
-- `fast`, `energetic`, `punchy`, `viral`
-- `minimal`, `clean`, `subtle`
-- `soft`, `smooth`, `elegant`
-- `dramatic`, `bold`
-- `glow`, `neon`, `shiny`
+Useful style words:
 
-## Common commands
+- `cinematic`, `movie`, `epic`
+- `smooth`, `soft`, `elegant`
+- `fast`, `punchy`, `viral`
+- `minimal`, `clean`, `subtle`
+- `glow`, `light`, `shiny`
+
+## Common Commands
 
 ```bash
-# Single render (via npm)
+# Render one file
 npm run render:reel -- ./html-carousel/coding_mistakes_beginners_carousel.html
 
-# Single render with custom output
+# Render one file with custom output path
 npm run render:reel -- ./html-carousel/career_ops_hindi_carousel.html \
   --output ./html-carousel/career_ops_hindi_custom.mp4
 
-# Batch render all HTML files in html-carousel/
+# Render every HTML file in html-carousel/
 npm run render:all
 
-# Batch render with shared style prompt
+# Batch render with a shared motion prompt
 npm run render:all -- --prompt "cinematic, glow, bold" --seconds-per-slide 3.2
 ```
 
-## How it works
-
-1. Detects `.slide` blocks from the source HTML.
-2. Converts slides into a HyperFrames composition in `.hyperframes-reel/`.
-3. Applies timeline animations and prompt-based style profile.
-4. Runs `npx hyperframes render` locally.
-5. Writes final `.mp4` next to the input HTML.
-
-## Project structure
+## Repo Structure
 
 ```text
 scripts/
-  render-carousel-reel.mjs   # main converter + animation compiler
+  render-carousel-reel.mjs   # main compiler + animation timeline builder
   render-all.mjs             # batch rendering helper
-render-reel                  # shortcut wrapper
-html-carousel/               # sample/input carousel files
+render-reel                  # shell wrapper for single renders
+html-carousel/               # example and source carousel HTML files
+docs/demo/                   # README screenshots from the sample reel
 ```
 
-## Open source publishing
+## Example Workflow
 
-### 1) Initialize git (if needed)
+A practical creator workflow looks like this:
 
-```bash
-git init
-git add .
-git commit -m "feat: open-source local html carousel reel generator"
-```
+1. Ask Claude to create a 7 to 10 slide HTML carousel.
+2. Save it in `html-carousel/`.
+3. Render it with `./render-reel`.
+4. Add voiceover or music outside this repo if needed.
+5. Publish the final MP4 to Reels, Shorts, or X.
 
-### 2) Create GitHub repo and push
+## Why Open Source
 
-```bash
-git branch -M main
-git remote add origin https://github.com/<your-username>/<repo-name>.git
-git push -u origin main
-```
+This repo exists for creators who want:
+
+- a local reel pipeline
+- source-controlled visual storytelling
+- no pay-per-render tooling
+- reusable HTML-based creative assets
+
+## Contributing
+
+Issues and pull requests are welcome.
+
+High-value contributions:
+
+- better motion presets
+- more resilient HTML pattern support
+- richer demo templates
+- improved renderer diagnostics
+- cross-platform render reliability
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 
