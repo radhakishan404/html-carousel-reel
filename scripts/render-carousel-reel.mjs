@@ -204,6 +204,13 @@ function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
+function readSlideDuration(node, $, fallbackSeconds) {
+  const raw = $(node).attr("data-duration");
+  if (raw == null || raw === "") return fallbackSeconds;
+  const value = Number(raw);
+  return Number.isFinite(value) && value > 0.5 ? value : fallbackSeconds;
+}
+
 function deriveStyleSpec(prompt) {
   const raw = String(prompt || "").trim().toLowerCase();
   const spec = {
@@ -299,7 +306,6 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
       const frame = document.getElementById("${frameId}");
       const duration = ${secondsPerSlide};
       const style = ${styleJson};
-      const exitStart = Math.max(0.6, duration - 0.6 * style.pace);
 
       function splitWords(el) {
         if (!el || el.hasAttribute("data-hf-split")) return [];
@@ -390,7 +396,6 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
 
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
-      const enterDuration = (0.42 + (style.motion - 1) * 0.08) * style.pace;
       const blockDuration = (0.46 + (style.motion - 1) * 0.05) * style.pace;
       const wordDuration = (0.36 + (style.motion - 1) * 0.04) * style.pace;
 
@@ -411,91 +416,105 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
 
       tl.fromTo(
         frame,
-        { opacity: 0, y: style.enterYOffset, scale: 1.035, filter: "blur(" + style.enterBlur + "px)" },
-        { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: enterDuration, ease: "power3.out" },
+        { scale: 1.01 },
+        { scale: style.zoom, duration: duration, ease: "sine.inOut" },
         0
       );
 
       if (lights.length) {
         tl.fromTo(
           lights[0],
-          { opacity: 0, xPercent: -100, yPercent: -20, rotate: -18 },
-          { opacity: 0.75 * style.lights, xPercent: 95, yPercent: 10, rotate: 8, duration: duration * 0.78, ease: "sine.inOut" },
-          0.02
+          { opacity: 0.2, xPercent: -100, yPercent: -20, rotate: -18 },
+          { opacity: 0.72 * style.lights, xPercent: 95, yPercent: 10, rotate: 8, duration: duration * 0.88, ease: "sine.inOut" },
+          0
         );
       }
       if (lights.length > 1) {
         tl.fromTo(
           lights[1],
-          { opacity: 0, xPercent: 100, yPercent: 30, rotate: 20 },
-          { opacity: 0.6 * style.lights, xPercent: -90, yPercent: -24, rotate: -14, duration: duration * 0.82, ease: "sine.inOut" },
-          0.09
+          { opacity: 0.12, xPercent: 100, yPercent: 30, rotate: 20 },
+          { opacity: 0.56 * style.lights, xPercent: -90, yPercent: -24, rotate: -14, duration: duration * 0.9, ease: "sine.inOut" },
+          0.04
         );
       }
       if (lights.length > 2) {
         tl.fromTo(
           lights[2],
-          { opacity: 0, xPercent: 0, yPercent: 70 },
-          { opacity: 0.32 * style.lights, xPercent: 0, yPercent: -68, duration: duration * 0.7, ease: "sine.inOut" },
-          0.15
+          { opacity: 0.08, xPercent: 0, yPercent: 70 },
+          { opacity: 0.28 * style.lights, xPercent: 0, yPercent: -68, duration: duration * 0.82, ease: "sine.inOut" },
+          0.08
         );
       }
 
       if (bars.length) {
         tl.fromTo(
           bars,
-          { scaleX: 0, transformOrigin: "0% 50%", opacity: 0.2 },
-          { scaleX: 1, opacity: 1, duration: 0.36, stagger: 0.05, ease: "power2.out" },
-          0.12
+          { scaleX: 0.55, transformOrigin: "0% 50%", opacity: 0.55 },
+          { scaleX: 1, opacity: 1, duration: 0.34, stagger: 0.04, ease: "power2.out" },
+          0
         );
       }
 
       if (primaryBlocks.length) {
-        tl.from(
+        tl.fromTo(
           primaryBlocks,
-          { opacity: 0, y: 18 * style.motion, filter: "blur(5px)", duration: blockDuration, stagger: style.blockStagger, ease: "power2.out" },
-          0.14
+          { opacity: 0.78, y: 4 * style.motion, filter: "blur(0.8px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: blockDuration, stagger: Math.max(0.014, style.blockStagger * 0.48), ease: "power2.out" },
+          0
         );
       }
 
       if (words.length) {
-        tl.from(
+        tl.fromTo(
           words,
           {
-            opacity: 0,
-            y: 16 * style.motion,
-            rotateX: -48,
+            opacity: 0.74,
+            y: 4 * style.motion,
+            rotateX: -6,
             transformOrigin: "50% 100%",
+            filter: "blur(0.65px)",
+          },
+          {
+            opacity: 1,
+            y: 0,
+            rotateX: 0,
+            filter: "blur(0px)",
             duration: wordDuration,
-            stagger: style.wordStagger,
+            stagger: Math.max(0.008, style.wordStagger * 0.62),
             ease: "power2.out",
           },
-          0.2
+          0.02
         );
       }
 
       if (recordItems.length) {
-        tl.from(
+        tl.fromTo(
           recordItems,
           {
-            opacity: 0,
-            y: 28 * style.motion,
-            scale: 0.965,
-            filter: "blur(7px)",
+            opacity: 0.72,
+            y: 8 * style.motion,
+            scale: 0.992,
+            filter: "blur(1px)",
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: "blur(0px)",
             duration: blockDuration,
-            stagger: Math.max(0.13, style.blockStagger * 4.2),
+            stagger: Math.max(0.1, style.blockStagger * 3),
             ease: "power2.out",
           },
-          0.58 * style.pace
+          0.08 * style.pace
         );
       }
 
       if (iconBits.length) {
         tl.fromTo(
           iconBits,
-          { scale: 0.9, opacity: 0.45 },
-          { scale: 1, opacity: 1, duration: 0.3 * style.pace, stagger: 0.035, ease: "back.out(1.6)" },
-          0.74 * style.pace
+          { scale: 0.94, opacity: 0.66 },
+          { scale: 1, opacity: 1, duration: 0.28 * style.pace, stagger: 0.028, ease: "back.out(1.5)" },
+          0.18 * style.pace
         );
       }
 
@@ -506,8 +525,8 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
         const state = { n: 0 };
         const recordIndex = recordItems.findIndex((item) => item.contains(el));
         const startAt = recordIndex >= 0
-          ? 0.66 * style.pace + recordIndex * Math.max(0.13, style.blockStagger * 4.2)
-          : 0.32 + idx * 0.05;
+          ? 0.34 * style.pace + recordIndex * Math.max(0.13, style.blockStagger * 4.2)
+          : 0.22 + idx * 0.05;
         tl.to(
           state,
           {
@@ -524,15 +543,6 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
           startAt
         );
       });
-
-      tl.to(frame, { scale: style.zoom, duration: duration, ease: "none" }, 0);
-
-      tl.to(
-        frame,
-        { opacity: 0, y: -style.exitYOffset, scale: 0.985, filter: "blur(" + style.exitBlur + "px)", duration: 0.34, ease: "power2.in" },
-        exitStart
-      );
-      tl.set(frame, { opacity: 0, visibility: "hidden" }, duration);
 
       window.__timelines["${slideCompId}"] = tl;
 `;
@@ -616,8 +626,8 @@ async function main() {
     .map((node) => $.html(node) || "")
     .join("\n");
   const styleSpec = deriveStyleSpec(opts.prompt);
-  const secondsPerSlide = opts.secondsPerSlide;
-  const totalDuration = Number((slides.length * secondsPerSlide).toFixed(3));
+  const slideDurations = slides.map((node) => readSlideDuration(node, $, opts.secondsPerSlide));
+  const totalDuration = Number(slideDurations.reduce((sum, value) => sum + value, 0).toFixed(3));
 
   await fs.rm(workDir, { recursive: true, force: true });
   await fs.mkdir(compositionsDir, { recursive: true });
@@ -626,6 +636,7 @@ async function main() {
 
   for (let i = 0; i < slides.length; i += 1) {
     const slideNode = slides[i];
+    const slideSeconds = slideDurations[i];
     const slideCompId = `slide-${String(i + 1).padStart(2, "0")}`;
     const frameId = `frame-${String(i + 1).padStart(2, "0")}`;
 
@@ -642,14 +653,14 @@ async function main() {
     root.removeAttr("data-track-index");
 
     const slideHtml = $.html(root) || "";
-    const slideScript = buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleSpec);
+    const slideScript = buildSlideAnimationScript(frameId, slideCompId, slideSeconds, styleSpec);
 
     const compositionHtml = `<template id="${slideCompId}-template">
   <div
     id="${slideCompId}-root"
     data-composition-id="${slideCompId}"
     data-start="0"
-    data-duration="${secondsPerSlide}"
+    data-duration="${slideSeconds}"
     data-width="${width}"
     data-height="${height}"
   >
@@ -684,7 +695,7 @@ ${slideScript
     const compositionPath = path.join(compositionsDir, `${slideCompId}.html`);
     await fs.writeFile(compositionPath, compositionHtml, "utf8");
 
-    const startTime = Number((i * secondsPerSlide).toFixed(3));
+    const startTime = Number(slideDurations.slice(0, i).reduce((sum, value) => sum + value, 0).toFixed(3));
     compositionEntries.push(
       `      <div id="clip-${i + 1}" data-composition-id="${slideCompId}" data-composition-src="compositions/${slideCompId}.html" data-start="${startTime}" data-track-index="0"></div>`,
     );
@@ -841,7 +852,8 @@ ${compositionEntries.join("\n")}
         slides: slides.length,
         width,
         height,
-        secondsPerSlide,
+        defaultSecondsPerSlide: opts.secondsPerSlide,
+        slideDurations,
         totalDuration,
         generatedAt: new Date().toISOString(),
       },
@@ -854,7 +866,7 @@ ${compositionEntries.join("\n")}
   console.log(`Input file:      ${inputAbs}`);
   console.log(`Detected slides: ${slides.length}`);
   console.log(`Resolution:      ${width}x${height} (${inferred.reason}${opts.width || opts.height ? ", overridden by flags" : ""})`);
-  console.log(`Duration:        ${totalDuration}s (${secondsPerSlide}s per slide)`);
+  console.log(`Duration:        ${totalDuration}s (${slideDurations.join(" / ")}s by slide)`);
   console.log(`Style profile:   ${styleSpec.profile}${opts.prompt ? " (from prompt)" : " (default)"}`);
   if (opts.prompt) {
     console.log(`Prompt:          ${opts.prompt}`);
