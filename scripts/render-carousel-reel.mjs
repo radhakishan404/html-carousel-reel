@@ -152,6 +152,8 @@ function detectDimensions(styleText) {
     return {
       width: even(igWidth * igExportScale),
       height: even(igHeight * igExportScale),
+      sourceWidth: igWidth,
+      sourceHeight: igHeight,
       reason: "CSS vars --ig-width/--ig-height",
     };
   }
@@ -162,6 +164,8 @@ function detectDimensions(styleText) {
     return {
       width: even(slideWidth * 2),
       height: even(slideHeight * 2),
+      sourceWidth: slideWidth,
+      sourceHeight: slideHeight,
       reason: "CSS vars --slide-w/--slide-h",
     };
   }
@@ -173,6 +177,8 @@ function detectDimensions(styleText) {
     return {
       width,
       height,
+      sourceWidth: width,
+      sourceHeight: height,
       reason: `first aspect-ratio ${ratio.num}/${ratio.den}`,
     };
   }
@@ -180,6 +186,8 @@ function detectDimensions(styleText) {
   return {
     width: 1080,
     height: 1350,
+    sourceWidth: 1080,
+    sourceHeight: 1350,
     reason: "default 4:5",
   };
 }
@@ -333,6 +341,14 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
           ".sl-note",
           ".repo-strip",
           ".avatar-wrap",
+          ".flow-node",
+          ".flow-arrow",
+          ".signal-card",
+          ".timeline-step",
+          ".pipeline-step",
+          ".orbit-node",
+          ".icon-chip",
+          ".icon-badge",
           ".watch-chip",
           ".chip",
           ".pill",
@@ -384,13 +400,14 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
       const recordItems = uniqueElements(
         frame.querySelectorAll(
           ".metric-card,.stat-card,.note-card,.map-card,.plan-card,.persona-card,.hn-card,.check-item,.command-box,.sl-note,.repo-strip,.avatar-wrap,.watch-chip,.chip,.pill,.tip-list li,.code-block,.copy-section"
+            + ",.flow-node,.flow-arrow,.signal-card,.timeline-step,.pipeline-step,.orbit-node,.icon-chip,.icon-badge"
         )
       );
       const bars = frame.querySelectorAll(".sl-accent-line,.s-val-accent-bar,.sl-page-fill,.sl-progress-fill");
       const words = collectWordTargets();
       const lights = frame.querySelectorAll(".hf-light");
-      const counters = frame.querySelectorAll(".metric-stars,.hn-chip strong,.map-num,.s1-number,.sl-page span,.slide-counter");
-      const iconBits = frame.querySelectorAll(".tip-icon,.check-icon,.sl-kicker,.sl-date");
+      const counters = frame.querySelectorAll(".metric-stars,.hn-chip strong,.map-num,.s1-number,.sl-page span,.slide-counter,.stat-value,.timeline-num");
+      const iconBits = frame.querySelectorAll(".tip-icon,.check-icon,.sl-kicker,.sl-date,.icon,.icon-badge");
 
       tl.fromTo(
         frame,
@@ -588,8 +605,16 @@ async function main() {
   const inferred = detectDimensions(styles);
   const width = opts.width != null ? even(opts.width) : inferred.width;
   const height = opts.height != null ? even(opts.height) : inferred.height;
+  const sourceWidth = inferred.sourceWidth || width;
+  const sourceHeight = inferred.sourceHeight || height;
+  const sourceScaleX = width / sourceWidth;
+  const sourceScaleY = height / sourceHeight;
 
   const sourceStageClass = pickSourceStageClass(styles);
+  const spriteHtml = $("body > svg")
+    .toArray()
+    .map((node) => $.html(node) || "")
+    .join("\n");
   const styleSpec = deriveStyleSpec(opts.prompt);
   const secondsPerSlide = opts.secondsPerSlide;
   const totalDuration = Number((slides.length * secondsPerSlide).toFixed(3));
@@ -632,6 +657,11 @@ async function main() {
       <div class="hf-light hf-light-a"></div>
       <div class="hf-light hf-light-b"></div>
       <div class="hf-light hf-light-c"></div>
+${spriteHtml
+  .split("\n")
+  .filter(Boolean)
+  .map((line) => `      ${line}`)
+  .join("\n")}
       <div class="${sourceStageClass}">
 ${slideHtml
   .split("\n")
@@ -741,15 +771,18 @@ ${styles
 
       .source-stage {
         position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
+        top: 0;
+        left: 0;
+        width: ${sourceWidth}px;
+        height: ${sourceHeight}px;
         max-width: none !important;
         max-height: none !important;
         margin: 0 !important;
         aspect-ratio: auto !important;
         border-radius: 0 !important;
         overflow: hidden;
+        transform: scale(${sourceScaleX}, ${sourceScaleY});
+        transform-origin: 0 0;
       }
 
       .source-stage:not(.export-frame) > .slide {

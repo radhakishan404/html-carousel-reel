@@ -5,15 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create HTML to Reel Carousel</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Sora:wght@600;700;800&display=swap');
 
     :root {
       --ig-width: 540px;
       --ig-height: 960px;
-      --ink: #131827;
-      --muted: #5d667c;
-      --line: rgba(19, 24, 39, 0.1);
-      --shadow: 0 32px 90px rgba(9, 14, 28, 0.38);
+      --ink: #f5f9ff;
+      --muted: rgba(231, 239, 255, 0.74);
+      --soft: rgba(231, 239, 255, 0.58);
+      --panel: rgba(14, 25, 48, 0.76);
+      --panel-strong: rgba(16, 30, 58, 0.9);
+      --line: rgba(211, 232, 255, 0.17);
+      --accent: #73d7ff;
+      --accent-2: #4ce0a5;
+      --accent-3: #ffd166;
+      --shadow: 0 34px 96px rgba(0, 0, 0, 0.45);
     }
 
     * { box-sizing: border-box; }
@@ -23,13 +29,9 @@
       min-height: 100vh;
       display: grid;
       place-items: center;
-      background:
-        radial-gradient(circle at 12% 0%, rgba(101, 140, 255, 0.28), transparent 28%),
-        radial-gradient(circle at 90% 85%, rgba(20, 200, 255, 0.2), transparent 26%),
-        linear-gradient(180deg, #0a1020 0%, #070c18 100%);
-      font-family: 'Manrope', sans-serif;
+      background: #050917;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       color: var(--ink);
-      padding: 0;
       overflow: hidden;
     }
 
@@ -37,12 +39,10 @@
       width: min(100vw, calc(100vh * 9 / 16));
       height: min(100vh, calc(100vw * 16 / 9));
       aspect-ratio: 9 / 16;
-      border-radius: 0;
       overflow: hidden;
       position: relative;
       box-shadow: var(--shadow);
-      border: none;
-      background: #0f1426;
+      background: #071021;
       user-select: none;
     }
 
@@ -51,7 +51,6 @@
       height: 100%;
       position: relative;
       overflow: hidden;
-      border-radius: inherit;
     }
 
     .slide {
@@ -59,18 +58,23 @@
       inset: 0;
       display: flex;
       flex-direction: column;
-      padding: 58px 52px 44px;
+      justify-content: center;
+      gap: 30px;
+      padding: 70px 48px;
       overflow: hidden;
       opacity: 0;
       transform: translateX(28px) scale(1.01);
       transition: opacity 0.44s ease, transform 0.44s ease;
       pointer-events: none;
       color: var(--ink);
-      --slide-bg: #edf2ff;
-      --slide-accent: #5f8dff;
-      --slide-accent-ink: #2f58b6;
-      --slide-shape: rgba(95, 141, 255, 0.12);
-      background: var(--slide-bg);
+      text-align: center;
+      --slide-accent: var(--accent);
+      --slide-accent-ink: #aee9ff;
+      background:
+        radial-gradient(circle at 50% 16%, rgba(90, 171, 255, 0.24), transparent 33%),
+        radial-gradient(circle at 18% 76%, rgba(76, 224, 165, 0.13), transparent 30%),
+        radial-gradient(circle at 86% 78%, rgba(255, 209, 102, 0.11), transparent 28%),
+        linear-gradient(180deg, #081125 0%, #0b1428 45%, #070d1d 100%);
     }
 
     .slide.active {
@@ -88,297 +92,483 @@
     }
 
     .slide::before {
-      width: 290px;
-      height: 290px;
-      border-radius: 38px;
-      border: 1px solid rgba(255,255,255,0.36);
-      background: rgba(255,255,255,0.34);
-      right: -96px;
-      top: 58px;
-      transform: rotate(13deg);
+      width: 380px;
+      height: 380px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(18deg);
+      border-radius: 44px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.07), transparent 44%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 34px);
+      opacity: 0.7;
     }
 
     .slide::after {
-      width: 260px;
-      height: 260px;
+      width: 600px;
+      height: 600px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
       border-radius: 50%;
-      right: -74px;
-      bottom: -70px;
-      background: var(--slide-shape);
+      background: radial-gradient(circle, rgba(115, 215, 255, 0.13), transparent 62%);
+      opacity: 0.9;
     }
 
-    .tone-night {
-      --slide-bg: #0a1226;
-      --slide-accent: #6dbdff;
-      --slide-accent-ink: #95d3ff;
-      --slide-shape: rgba(107, 189, 255, 0.16);
-      color: #ecf3ff;
-    }
+    .tone-night,
+    .tone-ice,
+    .tone-cyan,
+    .tone-mint,
+    .tone-gold { color: var(--ink); }
 
-    .tone-ice {
-      --slide-bg: #ebf2ff;
-      --slide-accent: #5f8dff;
-      --slide-accent-ink: #315dbf;
-      --slide-shape: rgba(95,141,255,0.14);
-    }
-
-    .tone-cyan {
-      --slide-bg: #e7f8ff;
-      --slide-accent: #1bc6ff;
-      --slide-accent-ink: #0b7db8;
-      --slide-shape: rgba(27,198,255,0.15);
-    }
-
-    .tone-mint {
-      --slide-bg: #e8faf1;
-      --slide-accent: #17bc7f;
-      --slide-accent-ink: #0f8058;
-      --slide-shape: rgba(23,188,127,0.16);
-    }
-
-    .tone-gold {
-      --slide-bg: #fff8e9;
-      --slide-accent: #f0b430;
-      --slide-accent-ink: #9a6b06;
-      --slide-shape: rgba(240,180,48,0.16);
-    }
+    .tone-night { --slide-accent: #73d7ff; --slide-accent-ink: #aee9ff; }
+    .tone-ice { --slide-accent: #8fb3ff; --slide-accent-ink: #c8d7ff; }
+    .tone-cyan { --slide-accent: #37d8ff; --slide-accent-ink: #b8f2ff; }
+    .tone-mint { --slide-accent: #4ce0a5; --slide-accent-ink: #b8ffd9; }
+    .tone-gold { --slide-accent: #ffd166; --slide-accent-ink: #ffe6a3; }
 
     .sl-meta,
+    .sl-footer { display: none !important; }
+
     .sl-top,
     .sl-body,
-    .sl-footer {
+    .sl-footer,
+    .sl-meta {
       position: relative;
       z-index: 1;
     }
 
-    .sl-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .meta-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 36px;
-      padding: 8px 13px;
-      border-radius: 999px;
-      border: 1px solid rgba(19, 24, 39, 0.08);
-      background: rgba(255,255,255,0.76);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .meta-pill strong {
-      color: var(--slide-accent-ink);
-      font-weight: 700;
-    }
-
     .sl-top {
-      margin-top: 22px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
     }
 
     .sl-title {
       margin: 0;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 76px;
-      line-height: 0.9;
-      letter-spacing: -0.06em;
-      max-width: 92%;
+      font-family: 'Sora', sans-serif;
+      font-size: 63px;
+      line-height: 0.94;
+      letter-spacing: -0.045em;
+      max-width: 100%;
       text-wrap: balance;
+      color: #f8fbff;
+      text-shadow: 0 20px 60px rgba(0,0,0,0.36);
     }
 
+    .sl-title.compact { font-size: 55px; }
+    .sl-title.large { font-size: 68px; }
+
     .sl-accent-line {
-      width: 122px;
-      height: 10px;
+      width: 124px;
+      height: 9px;
       border-radius: 999px;
-      margin: 18px 0 14px;
-      background: var(--slide-accent);
+      margin: 22px auto 18px;
+      background: linear-gradient(90deg, var(--slide-accent), rgba(255,255,255,0.82));
+      box-shadow: 0 0 26px color-mix(in srgb, var(--slide-accent) 70%, transparent);
     }
 
     .sl-copy {
+      margin: 0 auto;
       font-size: 29px;
-      line-height: 1.4;
-      color: rgba(19,24,39,0.75);
-      max-width: 96%;
+      line-height: 1.36;
+      color: var(--muted);
+      max-width: 94%;
       text-wrap: pretty;
     }
 
-    .sl-copy strong { color: var(--ink); }
+    .sl-copy strong { color: #ffffff; }
 
     .sl-note {
-      margin-top: 16px;
+      margin: 18px auto 0;
       width: fit-content;
-      max-width: 88%;
-      padding: 12px 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(19, 24, 39, 0.1);
-      background: rgba(255,255,255,0.72);
-      box-shadow: 0 12px 24px rgba(19, 24, 39, 0.08);
-      font-size: 28px;
-      line-height: 1.34;
+      max-width: 92%;
+      padding: 14px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255,255,255,0.13);
+      font-size: 25px;
+      line-height: 1.28;
+      color: rgba(244,248,255,0.86);
     }
 
     .sl-body {
-      margin-top: 20px;
+      width: 100%;
+      margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      flex: 1;
+      gap: 16px;
+      align-items: stretch;
       justify-content: center;
-      min-height: 0;
+      flex: 0 0 auto;
     }
+
+    .icon {
+      width: 28px;
+      height: 28px;
+      stroke: currentColor;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      display: block;
+    }
+
+    .hero-orbit {
+      position: relative;
+      width: 360px;
+      height: 150px;
+      margin: 2px auto 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: radial-gradient(circle, rgba(115, 215, 255, 0.12), rgba(255,255,255,0.03) 60%, transparent);
+    }
+
+    .orbit-node {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 42px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(14, 25, 48, 0.82);
+      color: rgba(244,248,255,0.9);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+      box-shadow: 0 16px 34px rgba(0,0,0,0.25);
+    }
+
+    .orbit-node:nth-child(2) { left: 2px; top: 8px; }
+    .orbit-node:nth-child(3) { right: 4px; top: 52px; }
+    .orbit-node:nth-child(4) { left: 94px; bottom: 4px; }
 
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 14px;
     }
 
     .stat-card,
     .plan-card,
     .persona-card,
     .command-box,
-    .cta-panel {
-      border-radius: 20px;
-      border: 1px solid rgba(19,24,39,0.1);
-      background: rgba(255,255,255,0.82);
-      box-shadow: 0 14px 28px rgba(19,24,39,0.08);
+    .cta-panel,
+    .flow-node,
+    .signal-card,
+    .timeline-step,
+    .pipeline-step {
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.105), rgba(255,255,255,0.055));
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255,255,255,0.12);
+      backdrop-filter: blur(18px);
     }
 
     .stat-card {
-      padding: 16px;
-      min-height: 150px;
+      min-height: 176px;
+      padding: 20px 17px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .stat-head,
+    .signal-head,
+    .pipeline-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: var(--slide-accent-ink);
+      background: color-mix(in srgb, var(--slide-accent) 18%, rgba(255,255,255,0.08));
+      border: 1px solid color-mix(in srgb, var(--slide-accent) 42%, rgba(255,255,255,0.1));
+      box-shadow: 0 0 26px color-mix(in srgb, var(--slide-accent) 26%, transparent);
+      flex: 0 0 auto;
+    }
+
+    .stat-label,
+    .cmd-header,
+    .mini-label,
+    .stack-pill,
+    .icon-chip,
+    .flow-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .stat-label {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 17px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 16px;
       color: var(--slide-accent-ink);
     }
 
     .stat-value {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 52px;
+      font-family: 'Sora', sans-serif;
+      font-size: 50px;
       letter-spacing: -0.05em;
       line-height: 0.92;
-      margin-top: 8px;
+      color: #ffffff;
     }
 
     .stat-desc {
-      margin-top: 8px;
-      font-size: 27px;
-      line-height: 1.32;
-      color: rgba(19,24,39,0.72);
+      font-size: 23px;
+      line-height: 1.26;
+      color: var(--muted);
+    }
+
+    .flow-lane {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: stretch;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .flow-node {
+      padding: 16px 12px;
+      min-height: 142px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .flow-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 25px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: #ffffff;
+    }
+
+    .flow-desc {
+      font-size: 18px;
+      line-height: 1.22;
+      color: var(--muted);
+    }
+
+    .flow-arrow {
+      align-self: center;
+      width: 35px;
+      height: 35px;
+      display: grid;
+      place-items: center;
+      color: var(--slide-accent-ink);
+      filter: drop-shadow(0 0 16px color-mix(in srgb, var(--slide-accent) 42%, transparent));
     }
 
     .command-box {
-      padding: 16px;
-      background: rgba(10, 15, 30, 0.9);
-      border-color: rgba(255,255,255,0.16);
-      color: #eaf3ff;
-      box-shadow: 0 16px 30px rgba(7, 10, 20, 0.34);
+      width: 100%;
+      text-align: left;
+      padding: 22px;
+      background: rgba(5, 10, 22, 0.82);
+      border-color: rgba(255,255,255,0.15);
     }
 
     .cmd-header {
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 18px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(224,236,255,0.72);
+      font-size: 17px;
+      color: rgba(224,236,255,0.74);
     }
 
-    .cmd-meta { color: rgba(224,236,255,0.58); }
+    .cmd-meta { color: rgba(224,236,255,0.54); }
 
     .cmd-pre {
       margin: 0;
       white-space: pre-wrap;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 24px;
-      line-height: 1.38;
-      color: #f2f7ff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      line-height: 1.46;
+      color: #f3f8ff;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      text-align: left;
+      tab-size: 2;
     }
 
-    .plan-card {
-      padding: 14px;
+    .command-box.slim .cmd-pre { font-size: 18px; }
+
+    .chips,
+    .icon-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .chip,
+    .icon-chip,
+    .stack-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.075);
+      color: rgba(244,248,255,0.86);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .chip .icon,
+    .icon-chip .icon,
+    .stack-pill .icon { width: 18px; height: 18px; }
+
+    .plan-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .plan-card,
+    .timeline-step {
+      text-align: left;
+      padding: 18px;
       display: grid;
-      grid-template-columns: 62px 1fr;
-      gap: 12px;
-      align-items: start;
+      grid-template-columns: 64px 1fr;
+      gap: 14px;
+      align-items: center;
     }
 
-    .plan-num {
-      width: 62px;
-      height: 62px;
-      border-radius: 18px;
+    .plan-num,
+    .timeline-num {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
       display: grid;
       place-items: center;
-      background: rgba(255,255,255,0.84);
-      border: 1px solid rgba(19,24,39,0.1);
+      background: color-mix(in srgb, var(--slide-accent) 17%, rgba(255,255,255,0.08));
+      border: 1px solid color-mix(in srgb, var(--slide-accent) 38%, rgba(255,255,255,0.1));
       color: var(--slide-accent-ink);
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 28px;
+      font-family: 'Sora', sans-serif;
+      font-size: 30px;
       letter-spacing: -0.04em;
     }
 
-    .plan-title {
-      font-family: 'Space Grotesk', sans-serif;
+    .plan-title,
+    .timeline-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 27px;
+      line-height: 1;
+      letter-spacing: -0.045em;
+      margin-bottom: 7px;
+      color: #ffffff;
+    }
+
+    .plan-desc,
+    .timeline-desc {
+      font-size: 22px;
+      line-height: 1.28;
+      color: var(--muted);
+    }
+
+    .signal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .signal-card {
+      min-height: 142px;
+      padding: 17px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .signal-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 26px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: #ffffff;
+    }
+
+    .signal-copy {
+      font-size: 21px;
+      line-height: 1.27;
+      color: var(--muted);
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .pipeline-step {
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 14px;
+      align-items: center;
+      text-align: left;
+    }
+
+    .pipeline-title {
+      font-family: 'Sora', sans-serif;
       font-size: 28px;
       line-height: 1;
       letter-spacing: -0.04em;
-      margin-bottom: 6px;
+      color: #ffffff;
     }
 
-    .plan-desc {
-      font-size: 27px;
-      line-height: 1.32;
-      color: rgba(19,24,39,0.72);
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-    }
-
-    .chip {
-      padding: 11px 15px;
-      border-radius: 999px;
-      border: 1px solid rgba(19,24,39,0.1);
-      background: rgba(255,255,255,0.78);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 18px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(19,24,39,0.82);
+    .pipeline-copy {
+      margin-top: 5px;
+      font-size: 21px;
+      line-height: 1.25;
+      color: var(--muted);
     }
 
     .persona-row {
       display: grid;
-      grid-template-columns: 116px 1fr;
-      gap: 12px;
+      grid-template-columns: 132px 1fr;
+      gap: 16px;
       align-items: center;
+      text-align: left;
     }
 
     .avatar-wrap {
-      width: 116px;
-      height: 116px;
-      border-radius: 28px;
+      width: 132px;
+      height: 132px;
+      border-radius: 32px;
       overflow: hidden;
-      border: 1px solid rgba(19,24,39,0.16);
-      box-shadow: 0 14px 30px rgba(9, 14, 28, 0.25);
-      background: #fff;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 42px rgba(0, 0, 0, 0.35);
+      background: rgba(255,255,255,0.08);
     }
 
     .avatar-wrap img {
@@ -389,564 +579,317 @@
     }
 
     .persona-card {
-      min-height: 116px;
-      padding: 14px;
+      min-height: 132px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .persona-name {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Sora', sans-serif;
       font-size: 32px;
       line-height: 1;
       letter-spacing: -0.04em;
       margin-bottom: 8px;
+      color: #ffffff;
     }
 
     .persona-note {
-      font-size: 28px;
-      line-height: 1.3;
-      color: rgba(19,24,39,0.72);
+      font-size: 22px;
+      line-height: 1.28;
+      color: var(--muted);
     }
 
     .repo-strip {
-      margin-top: 10px;
-      border-radius: 15px;
-      border: 1px solid rgba(19,24,39,0.1);
-      background: rgba(255,255,255,0.82);
-      padding: 10px 12px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      padding: 13px 14px;
       display: flex;
       align-items: center;
       gap: 12px;
+      text-align: left;
     }
 
     .repo-strip img {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      border: 1px solid rgba(19,24,39,0.08);
-      padding: 3px;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      padding: 4px;
       background: #fff;
       object-fit: contain;
       display: block;
     }
 
     .repo-name {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 22px;
-      letter-spacing: 0.04em;
-      color: rgba(19,24,39,0.82);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 19px;
+      letter-spacing: -0.03em;
+      color: rgba(244,248,255,0.88);
       line-height: 1.35;
       word-break: break-word;
     }
 
     .cta-panel {
-      padding: 20px;
-      border-radius: 24px;
+      width: 100%;
+      text-align: left;
+      padding: 26px;
+      border-radius: 30px;
     }
 
     .cta-title {
       margin: 0;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 48px;
-      line-height: 0.92;
-      letter-spacing: -0.05em;
-      max-width: 92%;
-    }
-
-    .cta-copy {
-      margin-top: 12px;
-      font-size: 30px;
-      line-height: 1.32;
-      color: rgba(19,24,39,0.74);
-      max-width: 94%;
-    }
-
-    .cta-code {
-      margin-top: 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(19,24,39,0.12);
-      background: rgba(19,24,39,0.95);
-      color: #e8f0ff;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 21px;
-      line-height: 1.42;
-      padding: 12px;
-      white-space: pre-wrap;
-    }
-
-    .sl-footer {
-      margin-top: auto;
-      padding-top: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .sl-source {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      line-height: 1.45;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(19,24,39,0.56);
-      max-width: 68%;
-    }
-
-    .sl-page {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10px;
-      color: rgba(19,24,39,0.62);
-      white-space: nowrap;
-    }
-
-    .sl-page-bar {
-      width: 96px;
-      height: 5px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(19,24,39,0.1);
-    }
-
-    .sl-page-fill {
-      height: 100%;
-      border-radius: inherit;
-      background: var(--slide-accent);
-    }
-
-    .tone-night .meta-pill,
-    .tone-night .chip,
-    .tone-night .plan-card,
-    .tone-night .stat-card,
-    .tone-night .persona-card,
-    .tone-night .repo-strip,
-    .tone-night .cta-panel,
-    .tone-night .sl-note {
-      border-color: rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.08);
-    }
-
-    .tone-night .sl-copy,
-    .tone-night .sl-note,
-    .tone-night .sl-source,
-    .tone-night .sl-page,
-    .tone-night .chip,
-    .tone-night .persona-note,
-    .tone-night .plan-desc,
-    .tone-night .stat-desc,
-    .tone-night .repo-name {
-      color: rgba(236,243,255,0.78);
-    }
-
-    .tone-night .sl-copy strong,
-    .tone-night .sl-title,
-    .tone-night .persona-name,
-    .tone-night .plan-title,
-    .tone-night .stat-value,
-    .tone-night .cta-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 46px;
+      line-height: 0.98;
+      letter-spacing: -0.045em;
       color: #ffffff;
     }
 
-    .tone-night .sl-page-bar {
-      background: rgba(236,243,255,0.2);
-    }
-
-    /* Reel render mode: no carousel chrome, centered presentation composition. */
-    .slide {
-      justify-content: center;
-      gap: 30px;
-      padding: 86px 58px;
-      text-align: center;
-    }
-
-    .slide::before {
-      width: 190px;
-      height: 190px;
-      right: -72px;
-      top: -34px;
-      opacity: 0.55;
-    }
-
-    .slide::after {
-      width: 210px;
-      height: 210px;
-      right: -76px;
-      bottom: -78px;
-      opacity: 0.55;
-    }
-
-    .sl-meta,
-    .sl-footer {
-      display: none !important;
-    }
-
-    .sl-top {
-      width: 100%;
-      margin-top: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .sl-title,
-    .cta-title,
-    .plan-title,
-    .persona-name,
-    .stat-value {
-      letter-spacing: 0;
-    }
-
-    .sl-title {
-      max-width: 100%;
-      font-size: 70px;
-    }
-
-    .sl-accent-line {
-      margin: 20px auto 16px;
-    }
-
-    .sl-copy,
-    .sl-note,
     .cta-copy {
-      margin-left: auto;
-      margin-right: auto;
-      max-width: 92%;
+      margin: 14px 0 0;
+      font-size: 26px;
+      line-height: 1.32;
+      color: var(--muted);
     }
 
-    .sl-body {
-      flex: 0 0 auto;
-      width: 100%;
-      margin-top: 0;
-      justify-content: center;
-    }
-
-    .stats-grid {
-      align-items: stretch;
-    }
-
-    .stat-card {
-      min-height: 0;
-      padding: 20px;
-    }
-
-    .stat-desc {
-      max-width: 92%;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .command-box {
-      width: 100%;
-      max-width: 100%;
-      text-align: left;
-      padding: 22px;
-    }
-
-    .plan-card {
-      text-align: left;
-      padding: 18px;
-      grid-template-columns: 70px 1fr;
-    }
-
-    .plan-num {
-      width: 70px;
-      height: 70px;
-      font-size: 34px;
-    }
-
-    .chips {
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .persona-row,
-    .repo-strip {
-      text-align: left;
-    }
-
-    .persona-row {
-      grid-template-columns: 132px 1fr;
-      gap: 16px;
-    }
-
-    .avatar-wrap {
-      width: 132px;
-      height: 132px;
-    }
-
-    .persona-card {
-      min-height: 132px;
-      padding: 18px;
-    }
-
-    .cta-panel {
-      width: 100%;
-      max-width: 100%;
-      margin: 0 auto;
-      text-align: left;
-      padding: 26px;
+    .cta-code {
+      margin-top: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(5,10,22,0.84);
+      color: #e8f0ff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      line-height: 1.46;
+      padding: 16px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     @media (max-width: 620px) {
-      body { padding: 0; }
-      .reel-shell {
-        width: 100vw;
-        height: 100vh;
-        aspect-ratio: auto;
-        border-radius: 0;
-        border: none;
-      }
-      .slide {
-        padding: 64px 36px;
-      }
-      .sl-title { font-size: 56px; }
+      .reel-shell { width: 100vw; height: 100vh; aspect-ratio: auto; }
+      .slide { padding: 60px 34px; }
+      .sl-title { font-size: 54px; }
+      .sl-title.compact { font-size: 46px; }
       .sl-copy { font-size: 24px; }
-      .plan-title,
-      .persona-name { font-size: 26px; }
-      .stat-value { font-size: 46px; }
+      .stats-grid,
+      .signal-grid { gap: 10px; }
+      .stat-desc,
+      .plan-desc,
+      .timeline-desc,
+      .pipeline-copy,
+      .signal-copy { font-size: 19px; }
+      .cmd-pre { font-size: 17px; }
     }
   </style>
 </head>
 <body>
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden">
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/><path d="m14.5 4-5 16"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><path d="M15 10l4.5-3A1 1 0 0 1 21 7.8v8.4a1 1 0 0 1-1.5.86L15 14"/><rect x="3" y="6" width="12" height="12" rx="2"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9L12 2Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.2L5.8 21 7 14.2 2 9.3l6.9-1L12 2Z"/></symbol>
+    <symbol id="i-git" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M6 21h12a2 2 0 0 0 2-2v-3"/><path d="M4 16v3a2 2 0 0 0 2 2"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 7 5 5-5 5"/><path d="M12 19h8"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 15h3"/><path d="M1 9h3"/><path d="M1 15h3"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v5"/><path d="M8 22h8"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 11-14h-8l0-6Z"/></symbol>
+    <symbol id="i-layout" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></symbol>
+  </svg>
+
   <main class="reel-shell">
     <div class="cr-phone" id="phone">
 
       <section class="slide tone-night active" data-index="1">
-        <div class="sl-meta">
-          <div class="meta-pill"><strong>Hook</strong> creator launch</div>
-          <div class="meta-pill">Slide 1 / 9</div>
-        </div>
+        <div class="sl-meta"><div></div></div>
         <div class="sl-top">
-          <h1 class="sl-title">Create HTML.<br />Render Reel.<br />Ship Today.</h1>
+          <h1 class="sl-title large">Create HTML.<br />Render Reel.<br />Ship Today.</h1>
           <div class="sl-accent-line"></div>
-          <div class="sl-copy"><strong>One open-source repo</strong> turns your static carousel into cinematic video with motion, counters, highlights, and transitions.</div>
-          <div class="sl-note">This reel itself follows the exact same workflow.</div>
+          <div class="sl-copy"><strong>One open-source repo</strong> turns a static carousel into a cinematic video with word reveals, counters, glowing bars, and flowing transitions.</div>
         </div>
-        <div class="sl-footer">
-          <div class="sl-source">Source / github.com/radhakishan404/html-carousel-reel</div>
-          <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:11.1%"></div></div><span>01 / 09</span></div>
+        <div class="sl-body">
+          <div class="hero-orbit">
+            <div class="orbit-ring"></div>
+            <div class="orbit-node"><svg class="icon"><use href="#i-code" /></svg> HTML</div>
+            <div class="orbit-node"><svg class="icon"><use href="#i-spark" /></svg> Motion</div>
+            <div class="orbit-node"><svg class="icon"><use href="#i-video" /></svg> MP4 Reel</div>
+          </div>
+          <div class="sl-note">This reel was generated by the same local workflow.</div>
         </div>
+        <div class="sl-footer"></div>
       </section>
 
       <section class="slide tone-ice" data-index="2">
-        <div class="sl-meta">
-          <div class="meta-pill"><strong>Value</strong> why it matters</div>
-          <div class="meta-pill">Fast creator stack</div>
-        </div>
+        <div class="sl-meta"><div></div></div>
         <div class="sl-top">
-          <h2 class="sl-title" style="font-size:62px;max-width:96%;">What you get from this repo in one setup</h2>
+          <h2 class="sl-title compact">What this repo gives you in one setup</h2>
           <div class="sl-accent-line"></div>
         </div>
         <div class="sl-body stats-grid">
           <div class="stat-card">
-            <div class="stat-label">cost</div>
+            <div class="stat-head"><div class="stat-label">cost</div><div class="icon-badge"><svg class="icon"><use href="#i-spark" /></svg></div></div>
             <div class="stat-value">$0</div>
-            <div class="stat-desc">Local render pipeline. No pay-per-video API required.</div>
+            <div class="stat-desc">Local render pipeline. No paid video API.</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">commands</div>
+            <div class="stat-head"><div class="stat-label">commands</div><div class="icon-badge"><svg class="icon"><use href="#i-terminal" /></svg></div></div>
             <div class="stat-value">3</div>
-            <div class="stat-desc">Clone, install, render. That is the core flow.</div>
+            <div class="stat-desc">Clone, install, render. Clean creator flow.</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">setup time</div>
+            <div class="stat-head"><div class="stat-label">setup time</div><div class="icon-badge"><svg class="icon"><use href="#i-clock" /></svg></div></div>
             <div class="stat-value">30m</div>
-            <div class="stat-desc">From fresh clone to your first polished MP4.</div>
+            <div class="stat-desc">From empty folder to first polished MP4.</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">format</div>
+            <div class="stat-head"><div class="stat-label">format</div><div class="icon-badge"><svg class="icon"><use href="#i-layout" /></svg></div></div>
             <div class="stat-value">9:16</div>
-            <div class="stat-desc">Reel-specific vertical output with cinematic motion.</div>
+            <div class="stat-desc">Vertical output built for reels and shorts.</div>
           </div>
         </div>
-        <div class="sl-footer">
-          <div class="sl-source">Positioning / creator execution tool, not template spam</div>
-          <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:22.2%"></div></div><span>02 / 09</span></div>
-        </div>
+        <div class="sl-footer"></div>
       </section>
 
       <section class="slide tone-cyan" data-index="3">
-        <div class="sl-meta">
-          <div class="meta-pill"><strong>Step 1</strong> support the repo</div>
-          <div class="meta-pill">Star + clone</div>
-        </div>
+        <div class="sl-meta"><div></div></div>
         <div class="sl-top">
-          <h2 class="sl-title" style="font-size:60px;max-width:96%;">Use this repo. Mark it star. Clone it locally.</h2>
+          <h2 class="sl-title compact">Use the repo. Star it. Clone it locally.</h2>
           <div class="sl-accent-line"></div>
         </div>
         <div class="sl-body">
-          <div class="command-box">
+          <div class="flow-lane">
+            <div class="flow-node"><div class="icon-badge"><svg class="icon"><use href="#i-star" /></svg></div><div class="flow-title">Star</div><div class="flow-desc">Support the open-source repo.</div></div>
+            <div class="flow-arrow"><svg class="icon"><use href="#i-arrow" /></svg></div>
+            <div class="flow-node"><div class="icon-badge"><svg class="icon"><use href="#i-git" /></svg></div><div class="flow-title">Clone</div><div class="flow-desc">Bring it to your machine.</div></div>
+            <div class="flow-arrow"><svg class="icon"><use href="#i-arrow" /></svg></div>
+            <div class="flow-node"><div class="icon-badge"><svg class="icon"><use href="#i-terminal" /></svg></div><div class="flow-title">Install</div><div class="flow-desc">Run once, then generate videos.</div></div>
+          </div>
+          <div class="command-box slim">
             <div class="cmd-header"><span>Terminal</span><span class="cmd-meta">starter commands</span></div>
-            <pre class="cmd-pre"># 1) Open repo and star it
-https://github.com/radhakishan404/html-carousel-reel
-
-# 2) Clone locally
-git clone https://github.com/radhakishan404/html-carousel-reel.git
+            <pre class="cmd-pre">git clone &lt;repo-url&gt;
 cd html-carousel-reel
-
-# 3) Install once
 npm install</pre>
           </div>
           <div class="chips">
-            <div class="chip">Open Source</div>
-            <div class="chip">MIT License</div>
-            <div class="chip">Local Render</div>
-            <div class="chip">No Subscription</div>
+            <div class="chip"><svg class="icon"><use href="#i-code" /></svg> Open Source</div>
+            <div class="chip"><svg class="icon"><use href="#i-spark" /></svg> MIT License</div>
+            <div class="chip"><svg class="icon"><use href="#i-video" /></svg> Local Render</div>
           </div>
         </div>
-        <div class="sl-footer">
-          <div class="sl-source">Action / star + clone is your one-time setup</div>
-          <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:33.3%"></div></div><span>03 / 09</span></div>
-        </div>
+        <div class="sl-footer"></div>
       </section>
 
       <section class="slide tone-mint" data-index="4">
-        <div class="sl-meta">
-          <div class="meta-pill"><strong>Step 2</strong> create content</div>
-          <div class="meta-pill">Claude to HTML</div>
-        </div>
+        <div class="sl-meta"><div></div></div>
         <div class="sl-top">
-          <h2 class="sl-title" style="font-size:58px;max-width:95%;">Generate carousel HTML with Claude first.</h2>
+          <h2 class="sl-title compact">Generate carousel HTML with Claude first.</h2>
           <div class="sl-accent-line"></div>
-          <div class="sl-copy">Ask Claude for 7-10 slides with hook, proof, command, CTA. Save under <strong>html-carousel/</strong>.</div>
+          <div class="sl-copy">Ask for 7-10 reel slides with hook, proof, workflow, command, and CTA. Save under <strong>html-carousel/</strong>.</div>
         </div>
-        <div class="sl-body">
+        <div class="sl-body plan-stack">
           <div class="plan-card">
-            <div class="plan-num">A</div>
-            <div>
-              <div class="plan-title">Prompt Structure</div>
-              <div class="plan-desc">Hook, pain, proof, workflow, CTA. One message per slide.</div>
-            </div>
+            <div class="plan-num"><svg class="icon"><use href="#i-mic" /></svg></div>
+            <div><div class="plan-title">Narration Ready</div><div class="plan-desc">Short sentences leave space for your voiceover.</div></div>
           </div>
           <div class="plan-card">
-            <div class="plan-num">B</div>
-            <div>
-              <div class="plan-title">Design Rules</div>
-              <div class="plan-desc">Big type, short lines, obvious hierarchy, high contrast.</div>
-            </div>
+            <div class="plan-num"><svg class="icon"><use href="#i-layout" /></svg></div>
+            <div><div class="plan-title">Big Visual Hierarchy</div><div class="plan-desc">Readable titles, cards, icons, and centered composition.</div></div>
           </div>
           <div class="plan-card">
-            <div class="plan-num">C</div>
-            <div>
-              <div class="plan-title">File Name</div>
-              <div class="plan-desc">Use clean names like create_html_to_reel_carousel.html.</div>
-            </div>
+            <div class="plan-num"><svg class="icon"><use href="#i-file" /></svg></div>
+            <div><div class="plan-title">Clean HTML File</div><div class="plan-desc">One file becomes the source for the final reel.</div></div>
           </div>
         </div>
-        <div class="sl-footer">
-          <div class="sl-source">Content engine / Claude writes deck, this repo renders cinematic video</div>
-          <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:44.4%"></div></div><span>04 / 09</span></div>
-        </div>
+        <div class="sl-footer"></div>
       </section>
 
       <section class="slide tone-gold" data-index="5">
-        <div class="sl-meta">
-          <div class="meta-pill"><strong>Step 3</strong> render video</div>
-          <div class="meta-pill">One command</div>
-        </div>
+        <div class="sl-meta"><div></div></div>
         <div class="sl-top">
-          <h2 class="sl-title" style="font-size:62px;max-width:95%;">Run one command. Get MP4 output.</h2>
+          <h2 class="sl-title compact">Run one command. Get MP4 output.</h2>
           <div class="sl-accent-line"></div>
         </div>
         <div class="sl-body">
-          <div class="command-box">
-            <div class="cmd-header"><span>Render</span><span class="cmd-meta">html -> reel</span></div>
-            <pre class="cmd-pre">./render-reel ./html-carousel/create_html_to_reel_carousel.html \
-  --prompt "cinematic, smooth, presentation" \
-  --seconds-per-slide 5.2 \
-  --quality high</pre>
+          <div class="pipeline">
+            <div class="pipeline-step"><div class="icon-badge"><svg class="icon"><use href="#i-file" /></svg></div><div><div class="pipeline-title">HTML Input</div><div class="pipeline-copy">Your carousel file is the creative source.</div></div></div>
+            <div class="pipeline-step"><div class="icon-badge"><svg class="icon"><use href="#i-cpu" /></svg></div><div><div class="pipeline-title">HyperFrames Render</div><div class="pipeline-copy">Animations, counters, glow and timing are applied.</div></div></div>
+            <div class="pipeline-step"><div class="icon-badge"><svg class="icon"><use href="#i-video" /></svg></div><div><div class="pipeline-title">Reel MP4</div><div class="pipeline-copy">Output is saved beside your HTML with _reel.mp4.</div></div></div>
           </div>
-          <div class="sl-note">Voila: MP4 gets saved beside your HTML with <strong>_reel.mp4</strong>.</div>
+          <div class="command-box slim">
+            <div class="cmd-header"><span>Render</span><span class="cmd-meta">html to reel</span></div>
+            <pre class="cmd-pre">./render-reel html-carousel/reel.html \
+--prompt "cinematic, smooth, presentation" \
+--seconds-per-slide 5.2</pre>
+          </div>
         </div>
-        <div class="sl-footer">
-          <div class="sl-source">Output / smooth motion, line reveals, counters, cinematic glow</div>
-          <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:55.5%"></div></div><span>05 / 09</span></div>
-        </div>
+        <div class="sl-footer"></div>
       </section>
 
       <section class="slide tone-ice" data-index="6">
-        <div class="sl-meta">
-          <div class="meta-pill"><strong>Prompt styles</strong> tune output</div>
-          <div class="meta-pill">Creative control</div>
-        </div>
+        <div class="sl-meta"><div></div></div>
         <div class="sl-top">
-          <h2 class="sl-title" style="font-size:58px;max-width:95%;">Prompt controls cinematic pacing.</h2>
+          <h2 class="sl-title compact">Prompt controls the animation style.</h2>
           <div class="sl-accent-line"></div>
         </div>
-        <div class="sl-body">
-          <div class="command-box">
-            <div class="cmd-header"><span>Style A</span><span class="cmd-meta">high energy</span></div>
-            <pre class="cmd-pre">--prompt "cinematic, neon, punchy, viral"</pre>
+        <div class="sl-body signal-grid">
+          <div class="signal-card">
+            <div class="signal-head"><div class="mini-label">energy</div><div class="icon-badge"><svg class="icon"><use href="#i-zap" /></svg></div></div>
+            <div><div class="signal-title">Viral Punch</div><div class="signal-copy">cinematic, neon, punchy, viral</div></div>
           </div>
-          <div class="command-box">
-            <div class="cmd-header"><span>Style B</span><span class="cmd-meta">presentation</span></div>
-            <pre class="cmd-pre">--prompt "smooth, slow, presentation, voiceover"</pre>
+          <div class="signal-card">
+            <div class="signal-head"><div class="mini-label">voiceover</div><div class="icon-badge"><svg class="icon"><use href="#i-mic" /></svg></div></div>
+            <div><div class="signal-title">Slow Reveal</div><div class="signal-copy">smooth, slow, presentation, voiceover</div></div>
           </div>
-          <div class="command-box">
-            <div class="cmd-header"><span>Style C</span><span class="cmd-meta">clean premium</span></div>
-            <pre class="cmd-pre">--prompt "minimal, elegant, clean"</pre>
+          <div class="signal-card">
+            <div class="signal-head"><div class="mini-label">premium</div><div class="icon-badge"><svg class="icon"><use href="#i-spark" /></svg></div></div>
+            <div><div class="signal-title">Clean Glow</div><div class="signal-copy">minimal, elegant, clean</div></div>
+          </div>
+          <div class="signal-card">
+            <div class="signal-head"><div class="mini-label">motion</div><div class="icon-badge"><svg class="icon"><use href="#i-video" /></svg></div></div>
+            <div><div class="signal-title">No Static Slides</div><div class="signal-copy">Words, cards and icons load one by one.</div></div>
           </div>
         </div>
-        <div class="sl-footer">
-          <div class="sl-source">Prompt mapping / controls motion intensity, glow, and reveal speed</div>
-          <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:66.6%"></div></div><span>06 / 09</span></div>
-        </div>
+        <div class="sl-footer"></div>
       </section>
 
       <section class="slide tone-cyan" data-index="7">
-        <div class="sl-meta">
-          <div class="meta-pill"><strong>Viral plan</strong> execution map</div>
-          <div class="meta-pill">Full strategy</div>
-        </div>
+        <div class="sl-meta"><div></div></div>
         <div class="sl-top">
-          <h2 class="sl-title" style="font-size:56px;max-width:95%;">Plan this like a presentation reel</h2>
+          <h2 class="sl-title compact">Plan this like a presentation reel.</h2>
           <div class="sl-accent-line"></div>
         </div>
-        <div class="sl-body">
-          <div class="plan-card">
-            <div class="plan-num">1</div>
-            <div>
-              <div class="plan-title">Hook in first 2 seconds</div>
-              <div class="plan-desc">Lead with a strong result statement that creators instantly want.</div>
-            </div>
+        <div class="sl-body plan-stack">
+          <div class="timeline-step">
+            <div class="timeline-num">1</div>
+            <div><div class="timeline-title">Hook in 2 seconds</div><div class="timeline-desc">Start with the final result: HTML carousel to reel video.</div></div>
           </div>
-          <div class="plan-card">
-            <div class="plan-num">2</div>
-            <div>
-              <div class="plan-title">Show exact workflow</div>
-              <div class="plan-desc">Repo link, clone command, render command, output path.</div>
-            </div>
+          <div class="timeline-step">
+            <div class="timeline-num">2</div>
+            <div><div class="timeline-title">Show exact workflow</div><div class="timeline-desc">Repo, clone command, render command, output path.</div></div>
           </div>
-          <div class="plan-card">
-            <div class="plan-num">3</div>
-            <div>
-              <div class="plan-title">Close with one CTA</div>
-              <div class="plan-desc">"Star, clone, run, and tag your output." Keep CTA frictionless.</div>
-            </div>
+          <div class="timeline-step">
+            <div class="timeline-num">3</div>
+            <div><div class="timeline-title">Close with one CTA</div><div class="timeline-desc">Star, clone, run, post your output, and tag the repo.</div></div>
           </div>
         </div>
-        <div class="sl-footer">
-          <div class="sl-source">Distribution / reels + shorts + X thread with command snippet</div>
-          <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:77.7%"></div></div><span>07 / 09</span></div>
-        </div>
+        <div class="sl-footer"></div>
       </section>
 
       <section class="slide tone-night" data-index="8">
-        <div class="sl-meta">
-          <div class="meta-pill"><strong>Creator</strong> profile identity</div>
-          <div class="meta-pill">GitHub assets</div>
-        </div>
+        <div class="sl-meta"><div></div></div>
         <div class="sl-top">
-          <h2 class="sl-title" style="font-size:56px;max-width:95%;">Built by @radhakishan404 with open-source intent</h2>
+          <h2 class="sl-title" style="font-size:54px;line-height:0.98;">Built by @radhakishan404 with open-source intent</h2>
           <div class="sl-accent-line"></div>
         </div>
         <div class="sl-body">
           <div class="persona-row">
-            <div class="avatar-wrap">
-              <img src="https://github.com/radhakishan404.png" alt="GitHub profile avatar" />
-            </div>
+            <div class="avatar-wrap"><img src="https://github.com/radhakishan404.png" alt="GitHub profile avatar" /></div>
             <div class="persona-card">
               <div class="persona-name">Radhakishan</div>
               <div class="persona-note">Creator stack: Claude for HTML carousel + this repo for cinematic reel rendering.</div>
@@ -956,38 +899,35 @@ npm install</pre>
             <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub mark" />
             <div class="repo-name">github.com/radhakishan404/html-carousel-reel</div>
           </div>
-          <div class="chips">
-            <div class="chip">Star the repo</div>
-            <div class="chip">Clone and run</div>
-            <div class="chip">Post your output</div>
+          <div class="icon-row">
+            <div class="icon-chip"><svg class="icon"><use href="#i-star" /></svg> Star the repo</div>
+            <div class="icon-chip"><svg class="icon"><use href="#i-git" /></svg> Clone and run</div>
+            <div class="icon-chip"><svg class="icon"><use href="#i-video" /></svg> Post output</div>
           </div>
         </div>
-        <div class="sl-footer">
-          <div class="sl-source">Branding / profile visuals build trust in the workflow</div>
-          <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:88.8%"></div></div><span>08 / 09</span></div>
-        </div>
+        <div class="sl-footer"></div>
       </section>
 
       <section class="slide tone-gold" data-index="9">
-        <div class="sl-meta">
-          <div class="meta-pill"><strong>Final</strong> call to action</div>
-          <div class="meta-pill">Ship now</div>
-        </div>
-        <div class="sl-body" style="justify-content:center;">
+        <div class="sl-meta"><div></div></div>
+        <div class="sl-body">
           <div class="cta-panel">
             <h2 class="cta-title">Your next reel is one HTML file away.</h2>
-            <div class="cta-copy">Generate with Claude, convert with this repo, record your voiceover, and publish with smooth cinematic pacing.</div>
-            <div class="cta-code">git clone https://github.com/radhakishan404/html-carousel-reel.git
+            <div class="cta-copy">Generate with Claude, convert locally with this repo, record your voiceover, and publish with smooth cinematic pacing.</div>
+            <div class="flow-lane" style="margin-top:18px;grid-template-columns:1fr auto 1fr auto 1fr;">
+              <div class="flow-node"><div class="icon-badge"><svg class="icon"><use href="#i-code" /></svg></div><div class="flow-title">HTML</div></div>
+              <div class="flow-arrow"><svg class="icon"><use href="#i-arrow" /></svg></div>
+              <div class="flow-node"><div class="icon-badge"><svg class="icon"><use href="#i-cpu" /></svg></div><div class="flow-title">Render</div></div>
+              <div class="flow-arrow"><svg class="icon"><use href="#i-arrow" /></svg></div>
+              <div class="flow-node"><div class="icon-badge"><svg class="icon"><use href="#i-video" /></svg></div><div class="flow-title">Reel</div></div>
+            </div>
+            <div class="cta-code">git clone &lt;repo-url&gt;
 cd html-carousel-reel
-./render-reel ./html-carousel/create_html_to_reel_carousel.html \
-  --prompt "smooth, presentation, voiceover" \
-  --seconds-per-slide 5.2</div>
+./render-reel html-carousel/reel.html \
+--prompt "smooth, presentation, voiceover"</div>
           </div>
         </div>
-        <div class="sl-footer">
-          <div class="sl-source">CTA / star + fork + render your own version + tag your reel</div>
-          <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:100%"></div></div><span>09 / 09</span></div>
-        </div>
+        <div class="sl-footer"></div>
       </section>
 
     </div>
