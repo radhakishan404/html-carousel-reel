@@ -3,6 +3,8 @@ node_modules/
 
 # generated workspaces
 .hyperframes-reel/
+.playwright-cli/
+output/playwright/
 
 # generated videos
 *_reel.mp4
