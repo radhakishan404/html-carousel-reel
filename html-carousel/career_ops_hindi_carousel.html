@@ -1,0 +1,1236 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Ops Instagram Carousel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  :root {
+    --ig-width: 540px;
+    --ig-height: 675px;
+    --ig-export-scale: 2;
+    --sl-x-pad: 20px;
+    --sl-bottom-gap: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #0a0a0f;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .cr-root {
+    font-family: 'Inter', sans-serif;
+    max-width: 592px;
+    margin: 0 auto;
+    user-select: none;
+    padding: 24px 16px 28px;
+  }
+
+  .cr-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .cr-meta-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.92);
+  }
+
+  .cr-meta-sub {
+    margin-top: 4px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.56);
+  }
+
+  .cr-export-btn {
+    appearance: none;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: linear-gradient(135deg, #faf5ff 0%, #c084fc 35%, #7c3aed 100%);
+    color: #0b0316;
+    border-radius: 999px;
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    box-shadow: 0 12px 28px rgba(124, 58, 237, 0.28);
+    white-space: nowrap;
+  }
+
+  .cr-export-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 30px rgba(124, 58, 237, 0.34);
+  }
+
+  .cr-export-btn:disabled {
+    opacity: 0.7;
+    cursor: progress;
+  }
+
+  .cr-status {
+    min-height: 18px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .cr-phone {
+    width: 100%;
+    max-width: var(--ig-width);
+    aspect-ratio: 4/5;
+    background:
+      radial-gradient(circle at top, rgba(167, 139, 250, 0.18), transparent 32%),
+      linear-gradient(180deg, #131318 0%, #050505 100%);
+    border-radius: 34px;
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.42);
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    opacity: 0; transform: translateX(40px);
+    transition: opacity 0.38s ease, transform 0.38s ease;
+    pointer-events: none;
+    --accent: #818cf8;
+    --accent-rgb: 129,140,248;
+  }
+
+  .slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 82% 16%, rgba(var(--accent-rgb), 0.16), transparent 26%),
+      radial-gradient(circle at 82% 76%, rgba(var(--accent-rgb), 0.11), transparent 28%),
+      linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .slide::after {
+    content: attr(data-mark);
+    position: absolute;
+    right: 18px;
+    bottom: 52px;
+    width: 64%;
+    font-size: 74px;
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    font-weight: 900;
+    text-align: right;
+    color: rgba(var(--accent-rgb), 0.08);
+    pointer-events: none;
+    z-index: 0;
+    text-transform: uppercase;
+  }
+
+  .slide.active {
+    opacity: 1; transform: translateX(0);
+    pointer-events: auto;
+  }
+  .slide.exit {
+    opacity: 0; transform: translateX(-40px);
+  }
+
+  .sl-left {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 62px;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 18px 0;
+    z-index: 10;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+  }
+
+  .sl-brand {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-top: auto;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .sl-progress-track {
+    width: 4px; flex: 1;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    margin: 12px 0;
+    position: relative; overflow: hidden;
+  }
+  .sl-progress-fill {
+    position: absolute; top: 0; left: 0; right: 0;
+    background: #fff;
+    border-radius: 3px;
+    transition: height 0.45s cubic-bezier(.4,0,.2,1);
+  }
+
+  .sl-num {
+    font-size: 11px; font-weight: 800;
+    color: rgba(255,255,255,0.4);
+    font-family: 'Inter', monospace;
+    letter-spacing: 0.06em;
+  }
+
+  .sl-body {
+    flex: 1; margin-left: 62px;
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+    z-index: 1;
+  }
+
+  .sl-header {
+    padding: 18px var(--sl-x-pad) 0 var(--sl-x-pad);
+    display: flex; align-items: center;
+    justify-content: space-between;
+  }
+  .sl-tag {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 6px 11px; border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .sl-handle {
+    font-size: 11px; font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .sl-icon-wrap {
+    display: flex; justify-content: center;
+    padding: 10px 0 10px;
+    flex-shrink: 0;
+  }
+
+  .sl-icon-circle {
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    box-shadow:
+      0 0 0 8px rgba(var(--accent-rgb), 0.05),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .sl-main {
+    flex: 1; padding: 20px;
+    display: flex; flex-direction: column;
+    justify-content: flex-start;
+    min-height: 0;
+  }
+
+  .sl-bottom-stack {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: var(--sl-bottom-gap);
+  }
+
+  .sl-bottom-stack > div {
+    backdrop-filter: blur(6px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+
+  .sl-headline {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800; line-height: 1.22;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+    max-width: 420px;
+  }
+
+  .sl-body-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400; line-height: 1.6;
+    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+  }
+
+  .sl-highlight {
+    display: inline-block;
+    padding: 2px 7px; border-radius: 6px;
+    font-weight: 700;
+  }
+
+  .sl-list { margin-top: 8px; }
+  .sl-list-item {
+    display: flex; align-items: flex-start;
+    gap: 8px; margin-bottom: 8px;
+  }
+  .sl-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    margin-top: 5px; flex-shrink: 0;
+  }
+  .sl-list-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; line-height: 1.45;
+    color: rgba(255,255,255,0.75);
+    font-weight: 400;
+  }
+
+  .sl-stat-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-top: 10px;
+  }
+  .sl-stat {
+    border-radius: 12px;
+    padding: 12px 11px;
+    border: 1px solid rgba(255,255,255,0.04);
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+  }
+  .sl-stat-num {
+    font-size: 24px; font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    line-height: 1;
+  }
+  .sl-stat-label {
+    font-size: 10px; margin-top: 3px;
+    font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+    opacity: 0.75; line-height: 1.3;
+  }
+
+  .sl-step-row {
+    display: flex; align-items: flex-start;
+    gap: 10px; margin-bottom: 8px;
+  }
+  .sl-step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+  }
+  .sl-step-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; line-height: 1.42;
+    color: rgba(255,255,255,0.8);
+    padding-top: 3px;
+  }
+  .sl-step-text strong {
+    color: #fff; display: block; font-size: 13px;
+    font-weight: 600;
+  }
+
+  .sl-cta-box {
+    margin: 10px 0 6px;
+    border-radius: 12px;
+    padding: 14px 14px;
+    text-align: center;
+  }
+  .sl-cta-main {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 700;
+    line-height: 1.4;
+  }
+  .sl-cta-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; margin-top: 6px;
+    opacity: 0.7; line-height: 1.5;
+  }
+
+  .sl-footer {
+    padding: 10px var(--sl-x-pad) 16px var(--sl-x-pad);
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: auto; flex-shrink: 0;
+  }
+  .sl-footer-left {
+    font-size: 10px; color: rgba(255,255,255,0.3);
+    font-family: 'Inter', monospace; letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .sl-swipe {
+    font-size: 10px; color: rgba(255,255,255,0.3);
+    font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .cr-nav {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; margin-top: 16px;
+  }
+  .cr-nav-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .cr-nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12); }
+  .cr-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .cr-dots { display: flex; gap: 5px; }
+  .cr-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.22);
+    transition: background 0.25s, transform 0.25s;
+  }
+  .cr-dot.on {
+    background: #ffffff;
+    transform: scale(1.3);
+  }
+
+  .mode-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 999px; padding: 5px 10px;
+    font-size: 10px; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.04em; margin: 3px 3px 3px 0;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .scoring-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 9px;
+  }
+  .scoring-label {
+    font-size: 11px; font-family: 'Inter', sans-serif;
+    color: rgba(255,255,255,0.65); min-width: 90px;
+  }
+  .scoring-bar {
+    flex: 1; height: 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.1); overflow: hidden;
+  }
+  .scoring-fill { height: 100%; border-radius: 3px; }
+  .scoring-pct {
+    font-size: 10px; font-weight: 700;
+    font-family: 'Inter', sans-serif; min-width: 28px;
+    text-align: right;
+  }
+
+  .export-root {
+    position: fixed;
+    left: -99999px;
+    top: 0;
+    width: var(--ig-width);
+    height: var(--ig-height);
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .export-frame {
+    width: var(--ig-width);
+    height: var(--ig-height);
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .export-frame .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto;
+  }
+
+  @media (max-width: 640px) {
+    .cr-root {
+      padding: 18px 10px 24px;
+    }
+
+    .cr-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .cr-export-btn {
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Career-ops GitHub repository explained in Hindi — interactive Instagram carousel for rk.codex</h2>
+
+<div class="cr-root">
+  <div class="cr-toolbar">
+    <div class="cr-meta">
+      <div class="cr-meta-label">Instagram Carousel Preview</div>
+      <div class="cr-meta-sub">Portrait 4:5 canvas • exports at 1080 x 1350 PNG</div>
+    </div>
+    <button class="cr-export-btn" id="downloadAllBtn" type="button" onclick="downloadAllSlides()">Download PNG Set</button>
+  </div>
+
+  <div class="cr-status" id="exportStatus" aria-live="polite"></div>
+
+  <div class="cr-phone" id="phone">
+
+    <!-- SLIDE 1: HOOK -->
+    <div class="slide active" id="s0" data-mark="FILTER" style="background:#0f0f0f;--accent:#818cf8;--accent-rgb:129,140,248">
+      <div class="sl-left">
+        <span class="sl-num">01</span>
+        <div class="sl-progress-track"><div class="sl-progress-fill" style="height:12.5%"></div></div>
+        <span class="sl-brand">@rk.codex</span>
+      </div>
+      <div class="sl-body">
+        <div class="sl-header">
+          <span class="sl-tag" style="background:#1a1a2e;color:#818cf8">AI Career System</span>
+          <span class="sl-handle">@rk.codex</span>
+        </div>
+        <div class="sl-icon-wrap">
+          <div class="sl-icon-circle" style="background:#1a1a2e">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+              <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="sl-main">
+          <div class="sl-headline" style="font-size:34px;color:#fff;line-height:1.04">
+            STOP APPLYING<br>TO THE WRONG JOBS.
+          </div>
+          <div class="sl-body-text" style="margin-top:2px;font-size:14px;line-height:1.55">
+            This open-source workflow screened <span class="sl-highlight" style="background:#1a1a2e;color:#818cf8">740+ roles</span>, created <span class="sl-highlight" style="background:#1a1a2e;color:#818cf8">100+ tailored resumes</span>, and helped land a <strong style="color:#fff">Head of AI</strong> role.
+          </div>
+          <div class="sl-list" style="margin-top:12px">
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#818cf8"></div>
+              <span class="sl-list-text">Scores roles before you waste time applying</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#818cf8"></div>
+              <span class="sl-list-text">Builds better resume variants for each opening</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#818cf8"></div>
+              <span class="sl-list-text">Turns a messy job hunt into a repeatable system</span>
+            </div>
+          </div>
+          <div class="sl-bottom-stack">
+            <div style="padding:12px 14px;border-radius:12px;background:#161622;border:1px solid rgba(129,140,248,0.16)">
+              <div style="font-size:10px;color:rgba(255,255,255,0.45);font-family:Inter,sans-serif;margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase">Why this hits</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(129,140,248,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#818cf8;line-height:1">740+</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">roles filtered</div>
+                </div>
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(129,140,248,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#818cf8;line-height:1">100+</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">resumes tailored</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:12px 14px;border-radius:12px;background:#1a1a2e;border:1px solid #2d2d5e">
+              <div style="font-size:11px;color:rgba(255,255,255,0.5);font-family:Inter,sans-serif;margin-bottom:4px;letter-spacing:0.06em;text-transform:uppercase">Tool to watch</div>
+              <div style="font-size:16px;font-weight:800;color:#818cf8;font-family:Inter,sans-serif;letter-spacing:-0.01em">career-ops</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;font-family:Inter,sans-serif">by santifer · GitHub · Open Source · Free</div>
+            </div>
+          </div>
+        </div>
+        <div class="sl-footer">
+          <span class="sl-footer-left">santifer/career-ops</span>
+          <span class="sl-swipe">Swipe
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: PROBLEM -->
+    <div class="slide" id="s1" data-mark="NOISE" style="background:#0d0d0d;--accent:#f87171;--accent-rgb:248,113,113">
+      <div class="sl-left">
+        <span class="sl-num">02</span>
+        <div class="sl-progress-track"><div class="sl-progress-fill" style="height:25%"></div></div>
+        <span class="sl-brand">@rk.codex</span>
+      </div>
+      <div class="sl-body">
+        <div class="sl-header">
+          <span class="sl-tag" style="background:#1f1010;color:#f87171">The Problem</span>
+          <span class="sl-handle">@rk.codex</span>
+        </div>
+        <div class="sl-icon-wrap">
+          <div class="sl-icon-circle" style="background:#1f1010">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="#f87171" stroke-width="1.8"/>
+              <path d="M12 8v4M12 16h.01" stroke="#f87171" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="sl-main">
+          <div class="sl-headline" style="font-size:31px;color:#fff;line-height:1.06">
+            MOST JOB HUNTS<br>ARE BROKEN.
+          </div>
+          <div class="sl-body-text" style="margin-top:0;font-size:14px;line-height:1.55">
+            You are not losing because you lack skill. You are losing because the process is noisy and manual.
+          </div>
+          <div class="sl-list" style="margin-top:10px">
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#f87171"></div>
+              <span class="sl-list-text">One generic resume means weak ATS matching</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#f87171"></div>
+              <span class="sl-list-text">Too many listings make bad roles look worth your time</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#f87171"></div>
+              <span class="sl-list-text">Manual tracking kills follow-up and consistency</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#f87171"></div>
+              <span class="sl-list-text">High volume does not equal high odds</span>
+            </div>
+          </div>
+          <div class="sl-bottom-stack">
+            <div style="padding:12px;border-radius:12px;background:#170f0f;border:1px solid rgba(248,113,113,0.14)">
+              <div style="font-size:10px;color:rgba(255,255,255,0.45);font-family:Inter,sans-serif;margin-bottom:7px;letter-spacing:0.08em;text-transform:uppercase">What this costs you</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(248,113,113,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#f87171;line-height:1">Hours</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">lost per week</div>
+                </div>
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(248,113,113,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#f87171;line-height:1">Low</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">signal-to-noise</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:10px;border-radius:8px;background:#1f1010;border-left:3px solid #f87171">
+              <div style="font-size:12px;color:rgba(255,255,255,0.8);font-family:Inter,sans-serif;line-height:1.5">The viral idea here is simple: <strong style="color:#f87171">filter first, apply second.</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="sl-footer">
+          <span class="sl-footer-left">santifer/career-ops</span>
+          <span class="sl-swipe">Swipe
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: WHAT IS IT -->
+    <div class="slide" id="s2" data-mark="OPS" style="background:#080f0c;--accent:#34d399;--accent-rgb:52,211,153">
+      <div class="sl-left">
+        <span class="sl-num">03</span>
+        <div class="sl-progress-track"><div class="sl-progress-fill" style="height:37.5%"></div></div>
+        <span class="sl-brand">@rk.codex</span>
+      </div>
+      <div class="sl-body">
+        <div class="sl-header">
+          <span class="sl-tag" style="background:#0d1f18;color:#34d399">What It Does</span>
+          <span class="sl-handle">@rk.codex</span>
+        </div>
+        <div class="sl-icon-wrap">
+          <div class="sl-icon-circle" style="background:#0d1f18">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="7" height="7" rx="1" stroke="#34d399" stroke-width="1.8"/>
+              <rect x="14" y="3" width="7" height="7" rx="1" stroke="#34d399" stroke-width="1.8"/>
+              <rect x="3" y="14" width="7" height="7" rx="1" stroke="#34d399" stroke-width="1.8"/>
+              <path d="M17.5 14v6M14.5 17h6" stroke="#34d399" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="sl-main">
+          <div class="sl-headline" style="font-size:30px;color:#fff;line-height:1.08">
+            CAREER-OPS RUNS<br>JOB SEARCH LIKE OPS.
+          </div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.68);margin:4px 0 10px;line-height:1.55;font-family:Inter,sans-serif">
+            Built on Claude Code, it finds roles, evaluates fit, builds resume variants, and tracks the pipeline as one repeatable workflow.
+          </div>
+          <div class="sl-bottom-stack">
+            <div class="sl-stat-row">
+              <div class="sl-stat" style="background:#0d1f18">
+                <div class="sl-stat-num" style="color:#34d399">740+</div>
+                <div class="sl-stat-label" style="color:rgba(255,255,255,0.6)">Roles scored</div>
+              </div>
+              <div class="sl-stat" style="background:#0d1f18">
+                <div class="sl-stat-num" style="color:#34d399">100+</div>
+                <div class="sl-stat-label" style="color:rgba(255,255,255,0.6)">Resumes generated</div>
+              </div>
+              <div class="sl-stat" style="background:#0d1f18">
+                <div class="sl-stat-num" style="color:#34d399">14</div>
+                <div class="sl-stat-label" style="color:rgba(255,255,255,0.6)">Agent modes</div>
+              </div>
+              <div class="sl-stat" style="background:#0d1f18">
+                <div class="sl-stat-num" style="color:#34d399">10x</div>
+                <div class="sl-stat-label" style="color:rgba(255,255,255,0.6)">Faster triage</div>
+              </div>
+            </div>
+            <div style="padding:10px 12px;border-radius:10px;background:#0d1f18;border:1px solid rgba(52,211,153,0.14);font-size:12px;color:#b7f7da;line-height:1.5">
+              Less busywork. More signal. Better applications.
+            </div>
+          </div>
+        </div>
+        <div class="sl-footer">
+          <span class="sl-footer-left">santifer/career-ops</span>
+          <span class="sl-swipe">Swipe
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: HOW IT WORKS -->
+    <div class="slide" id="s3" data-mark="LOOP" style="background:#0d0a14;--accent:#a78bfa;--accent-rgb:167,139,250">
+      <div class="sl-left">
+        <span class="sl-num">04</span>
+        <div class="sl-progress-track"><div class="sl-progress-fill" style="height:50%"></div></div>
+        <span class="sl-brand">@rk.codex</span>
+      </div>
+      <div class="sl-body">
+        <div class="sl-header">
+          <span class="sl-tag" style="background:#1a1030;color:#a78bfa">Workflow</span>
+          <span class="sl-handle">@rk.codex</span>
+        </div>
+        <div class="sl-icon-wrap">
+          <div class="sl-icon-circle" style="background:#1a1030">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#a78bfa" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#a78bfa" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="sl-main">
+          <div class="sl-headline" style="font-size:30px;color:#fff;margin-bottom:10px;line-height:1.06">
+            HERE'S THE 4-STEP LOOP.
+          </div>
+          <div class="sl-step-row">
+            <div class="sl-step-num" style="background:#1a1030;color:#a78bfa">1</div>
+            <div class="sl-step-text"><strong>Drop a job URL</strong>The agent opens the listing and reads the real requirements</div>
+          </div>
+          <div class="sl-step-row">
+            <div class="sl-step-num" style="background:#1a1030;color:#a78bfa">2</div>
+            <div class="sl-step-text"><strong>Get a fit score</strong>Each role is graded across 10 dimensions before you commit</div>
+          </div>
+          <div class="sl-step-row">
+            <div class="sl-step-num" style="background:#1a1030;color:#a78bfa">3</div>
+            <div class="sl-step-text"><strong>Generate a tailored resume</strong>Keywords and proof points are matched to the role</div>
+          </div>
+          <div class="sl-step-row">
+            <div class="sl-step-num" style="background:#1a1030;color:#a78bfa">4</div>
+            <div class="sl-step-text"><strong>Review and decide</strong>AI does the heavy lifting, but the final call stays with you</div>
+          </div>
+          <div class="sl-bottom-stack">
+            <div style="padding:12px;border-radius:12px;background:#151021;border:1px solid rgba(167,139,250,0.14)">
+              <div style="font-size:10px;color:rgba(255,255,255,0.45);font-family:Inter,sans-serif;margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase">What changes</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(167,139,250,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#a78bfa;line-height:1">Less</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">manual triage</div>
+                </div>
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(167,139,250,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#a78bfa;line-height:1">More</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">quality decisions</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:8px 10px;border-radius:7px;background:#1a1030;font-size:11.5px;color:#c7b8ff;font-family:Inter,sans-serif;line-height:1.5">
+              Human-in-the-loop by design. Automation without losing control.
+            </div>
+          </div>
+        </div>
+        <div class="sl-footer">
+          <span class="sl-footer-left">santifer/career-ops</span>
+          <span class="sl-swipe">Swipe
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: SCORING -->
+    <div class="slide" id="s4" data-mark="SCORE" style="background:#0a0f0a;--accent:#4ade80;--accent-rgb:74,222,128">
+      <div class="sl-left">
+        <span class="sl-num">05</span>
+        <div class="sl-progress-track"><div class="sl-progress-fill" style="height:62.5%"></div></div>
+        <span class="sl-brand">@rk.codex</span>
+      </div>
+      <div class="sl-body">
+        <div class="sl-header">
+          <span class="sl-tag" style="background:#0d2010;color:#4ade80">Smart Scoring</span>
+          <span class="sl-handle">@rk.codex</span>
+        </div>
+        <div class="sl-icon-wrap">
+          <div class="sl-icon-circle" style="background:#0d2010">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="sl-main">
+          <div class="sl-headline" style="font-size:28px;color:#fff;margin-bottom:4px;line-height:1.08">
+            THE SCORE TELLS YOU<br>WHAT DESERVES YOUR TIME.
+          </div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.58);margin-bottom:10px;font-family:Inter,sans-serif;line-height:1.45">If a role does not clear the bar, skip it. The system rewards focus, not spam.</div>
+          <div class="scoring-row">
+            <span class="scoring-label">Role Match</span>
+            <div class="scoring-bar"><div class="scoring-fill" style="width:95%;background:#4ade80"></div></div>
+            <span class="scoring-pct" style="color:#4ade80">Gate</span>
+          </div>
+          <div class="scoring-row">
+            <span class="scoring-label">Skills Align</span>
+            <div class="scoring-bar"><div class="scoring-fill" style="width:95%;background:#4ade80"></div></div>
+            <span class="scoring-pct" style="color:#4ade80">Gate</span>
+          </div>
+          <div class="scoring-row">
+            <span class="scoring-label">Salary Fit</span>
+            <div class="scoring-bar"><div class="scoring-fill" style="width:80%;background:#86efac"></div></div>
+            <span class="scoring-pct" style="color:#86efac">High</span>
+          </div>
+          <div class="scoring-row">
+            <span class="scoring-label">Growth Scope</span>
+            <div class="scoring-bar"><div class="scoring-fill" style="width:70%;background:#86efac"></div></div>
+            <span class="scoring-pct" style="color:#86efac">Med</span>
+          </div>
+          <div class="scoring-row">
+            <span class="scoring-label">Location/Remote</span>
+            <div class="scoring-bar"><div class="scoring-fill" style="width:60%;background:#bbf7d0"></div></div>
+            <span class="scoring-pct" style="color:#bbf7d0">Low</span>
+          </div>
+          <div class="sl-bottom-stack">
+            <div style="padding:12px;border-radius:12px;background:#0d1810;border:1px solid rgba(74,222,128,0.14)">
+              <div style="font-size:10px;color:rgba(255,255,255,0.45);font-family:Inter,sans-serif;margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase">Best use case</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(74,222,128,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#4ade80;line-height:1">Score</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">every role first</div>
+                </div>
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(74,222,128,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#4ade80;line-height:1">Apply</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">only to high-fit roles</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:8px 10px;border-radius:7px;background:#0d2010;font-size:11.5px;color:#baf7ce;font-family:Inter,sans-serif;line-height:1.5">
+              Under 4.0/5? Do not apply. Save your energy for stronger bets.
+            </div>
+          </div>
+        </div>
+        <div class="sl-footer">
+          <span class="sl-footer-left">santifer/career-ops</span>
+          <span class="sl-swipe">Swipe
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: 14 MODES -->
+    <div class="slide" id="s5" data-mark="MODES" style="background:#0d0d0f;--accent:#60a5fa;--accent-rgb:96,165,250">
+      <div class="sl-left">
+        <span class="sl-num">06</span>
+        <div class="sl-progress-track"><div class="sl-progress-fill" style="height:75%"></div></div>
+        <span class="sl-brand">@rk.codex</span>
+      </div>
+      <div class="sl-body">
+        <div class="sl-header">
+          <span class="sl-tag" style="background:#141428;color:#60a5fa">Agent Modes</span>
+          <span class="sl-handle">@rk.codex</span>
+        </div>
+        <div class="sl-icon-wrap">
+          <div class="sl-icon-circle" style="background:#141428">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2a4 4 0 0 1 4 4v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2V6a4 4 0 0 1 4-4z" stroke="#60a5fa" stroke-width="1.8"/>
+              <circle cx="12" cy="13" r="2" stroke="#60a5fa" stroke-width="1.8"/>
+            </svg>
+          </div>
+        </div>
+        <div class="sl-main">
+          <div class="sl-headline" style="font-size:30px;color:#fff;margin-bottom:6px;line-height:1.06">
+            14 MODES.<br>ONE JOB ENGINE.
+          </div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.62);margin-bottom:8px;font-family:Inter,sans-serif;line-height:1.48">
+            This is not just resume writing. It handles research, evaluation, batching, pipelines, and execution.
+          </div>
+          <div style="display:flex;flex-wrap:wrap;margin-bottom:8px">
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">Evaluate</span>
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">PDF Generate</span>
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">Portal Scan</span>
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">Batch Process</span>
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">Auto Pipeline</span>
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">LinkedIn Helper</span>
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">Form Fill</span>
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">Salary Negotiate</span>
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">Company Research</span>
+            <span class="mode-chip" style="background:#141428;color:#93c5fd">Training Mode</span>
+          </div>
+          <div class="sl-bottom-stack">
+            <div style="padding:12px;border-radius:12px;background:#111627;border:1px solid rgba(96,165,250,0.14)">
+              <div style="font-size:10px;color:rgba(255,255,255,0.45);font-family:Inter,sans-serif;margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase">Why people save this</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(96,165,250,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#60a5fa;line-height:1">14</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">workflow modes</div>
+                </div>
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(96,165,250,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#60a5fa;line-height:1">122</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">URLs in batch</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:10px;border-radius:8px;background:#141428;font-size:12px;color:rgba(255,255,255,0.78);font-family:Inter,sans-serif;line-height:1.55">
+              Batch-process <strong style="color:#60a5fa">122 URLs at once</strong>. Scan Greenhouse, Ashby, Lever, and Wellfound, then move only the best matches forward.
+            </div>
+          </div>
+        </div>
+        <div class="sl-footer">
+          <span class="sl-footer-left">santifer/career-ops</span>
+          <span class="sl-swipe">Swipe
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: WHY FOR INDIA -->
+    <div class="slide" id="s6" data-mark="EDGE" style="background:#110a05;--accent:#fb923c;--accent-rgb:251,146,60">
+      <div class="sl-left">
+        <span class="sl-num">07</span>
+        <div class="sl-progress-track"><div class="sl-progress-fill" style="height:87.5%"></div></div>
+        <span class="sl-brand">@rk.codex</span>
+      </div>
+      <div class="sl-body">
+        <div class="sl-header">
+          <span class="sl-tag" style="background:#1f1408;color:#fb923c">Why It Matters</span>
+          <span class="sl-handle">@rk.codex</span>
+        </div>
+        <div class="sl-icon-wrap">
+          <div class="sl-icon-circle" style="background:#1f1408">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="#fb923c" stroke-width="1.8"/>
+              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="#fb923c" stroke-width="1.8"/>
+            </svg>
+          </div>
+        </div>
+        <div class="sl-main">
+          <div class="sl-headline" style="font-size:29px;color:#fff;margin-bottom:8px;line-height:1.06">
+            THE EDGE IS SIMPLE:<br>BETTER FILTERING.
+          </div>
+          <div class="sl-body-text" style="margin-top:0;font-size:13.5px;line-height:1.5">
+            The developers who win are not the ones who apply more. They apply smarter.
+          </div>
+          <div class="sl-list">
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#fb923c"></div>
+              <span class="sl-list-text"><strong style="color:#fff">Higher-quality applications</strong> with role-specific resumes instead of generic spam</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#fb923c"></div>
+              <span class="sl-list-text"><strong style="color:#fff">Faster decision-making</strong> because weak roles are filtered out early</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#fb923c"></div>
+              <span class="sl-list-text"><strong style="color:#fff">Better remote-job readiness</strong> for global roles with stronger positioning</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#fb923c"></div>
+              <span class="sl-list-text"><strong style="color:#fff">Safer workflow</strong> because your documents stay local instead of living in random tools</span>
+            </div>
+          </div>
+          <div class="sl-bottom-stack">
+            <div style="padding:12px;border-radius:12px;background:#1b130d;border:1px solid rgba(251,146,60,0.14)">
+              <div style="font-size:10px;color:rgba(255,255,255,0.45);font-family:Inter,sans-serif;margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase">The real takeaway</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(251,146,60,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#fb923c;line-height:1">Smarter</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">targeting</div>
+                </div>
+                <div style="padding:8px 9px;border-radius:10px;background:rgba(251,146,60,0.08)">
+                  <div style="font-size:18px;font-weight:800;color:#fb923c;line-height:1">Higher</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.52);margin-top:3px">application quality</div>
+                </div>
+              </div>
+            </div>
+            <div style="padding:8px 10px;border-radius:7px;background:#1f1408;font-size:11.5px;color:#ffd2ae;font-family:Inter,sans-serif;line-height:1.5;border-left:2px solid #fb923c">
+              The win is not more applications. The win is better shots on goal.
+            </div>
+          </div>
+        </div>
+        <div class="sl-footer">
+          <span class="sl-footer-left">santifer/career-ops</span>
+          <span class="sl-swipe">Swipe
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: CTA -->
+    <div class="slide" id="s7" data-mark="START" style="background:#0a0a0a;--accent:#e5e5e5;--accent-rgb:229,229,229">
+      <div class="sl-left">
+        <span class="sl-num">08</span>
+        <div class="sl-progress-track"><div class="sl-progress-fill" style="height:100%"></div></div>
+        <span class="sl-brand">@rk.codex</span>
+      </div>
+      <div class="sl-body">
+        <div class="sl-header">
+          <span class="sl-tag" style="background:#1a1a1a;color:#e5e5e5">Next Step</span>
+          <span class="sl-handle">@rk.codex</span>
+        </div>
+        <div class="sl-icon-wrap">
+          <div class="sl-icon-circle" style="background:#1a1a1a">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="#e5e5e5" stroke-width="1.8" stroke-linecap="round"/>
+              <polyline points="22 4 12 14.01 9 11.01" stroke="#e5e5e5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="sl-main">
+          <div class="sl-headline" style="font-size:30px;color:#fff;margin-bottom:8px;line-height:1.06">
+            SAVE THIS FOR YOUR<br>NEXT JOB SEARCH.
+          </div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:10px;font-family:Inter,sans-serif;line-height:1.55">
+            If random applications are not working, test a smarter system this week:
+          </div>
+          <div class="sl-list" style="margin-top:0">
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#e5e5e5"></div>
+              <span class="sl-list-text">Score roles before you apply</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#e5e5e5"></div>
+              <span class="sl-list-text">Tailor resumes only for top matches</span>
+            </div>
+            <div class="sl-list-item">
+              <div class="sl-dot" style="background:#e5e5e5"></div>
+              <span class="sl-list-text">Track every application like a pipeline</span>
+            </div>
+          </div>
+          <div class="sl-bottom-stack">
+            <div class="sl-cta-box" style="background:#1a1a1a;border:1px solid #333">
+              <div class="sl-cta-main" style="color:#fff">
+                Comment <span style="background:#fff;color:#000;padding:2px 10px;border-radius:4px;font-family:Inter,sans-serif">CAREER OPS</span>
+              </div>
+              <div class="sl-cta-sub" style="color:rgba(255,255,255,0.5)">
+                if you want the full setup breakdown in the next post
+              </div>
+            </div>
+            <div style="padding:11px 12px;border-radius:12px;background:#121212;border:1px solid rgba(255,255,255,0.08)">
+              <div style="font-size:10px;color:rgba(255,255,255,0.45);font-family:Inter,sans-serif;margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase">Do this next</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.76);line-height:1.55">Save this post, star the repo, and test the workflow on 10 real roles before your next application sprint.</div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.35);font-family:Inter,sans-serif">
+              Follow @rk.codex for more AI + career tools
+            </div>
+          </div>
+        </div>
+        <div class="sl-footer">
+          <span class="sl-footer-left">github.com/santifer/career-ops</span>
+          <span class="sl-swipe" style="color:rgba(255,255,255,0.2)">Save it</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="cr-nav">
+    <button class="cr-nav-btn" id="prev" onclick="navigate(-1)" aria-label="Previous slide">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.82)" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="cr-dots" id="dots"></div>
+    <button class="cr-nav-btn" id="next" onclick="navigate(1)" aria-label="Next slide">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.82)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+
+  <div class="export-root" id="exportRoot" aria-hidden="true"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+  const total = 8;
+  let cur = 0;
+  let isExporting = false;
+
+  const exportStatus = document.getElementById('exportStatus');
+  const exportRoot = document.getElementById('exportRoot');
+  const downloadAllBtn = document.getElementById('downloadAllBtn');
+  const phone = document.getElementById('phone');
+  const slides = [...document.querySelectorAll('.slide')];
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  const dotsEl = document.getElementById('dots');
+  for(let i=0;i<total;i++){
+    const d = document.createElement('div');
+    d.className='cr-dot'+(i===0?' on':'');
+    d.onclick=()=>goTo(i);
+    d.style.cursor='pointer';
+    dotsEl.appendChild(d);
+  }
+
+  function setNavState() {
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === total - 1;
+  }
+
+  function syncQueryParam() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('slide', String(cur + 1));
+    window.history.replaceState({}, '', url);
+  }
+
+  function goTo(n, options = {}){
+    const { animate = true, updateQuery = true } = options;
+    if (n === cur && slides[cur].classList.contains('active')) {
+      if (updateQuery) syncQueryParam();
+      return;
+    }
+    if (animate) {
+      slides[cur].classList.remove('active');
+      slides[cur].classList.add('exit');
+      setTimeout(()=>slides[cur].classList.remove('exit'),400);
+    } else {
+      slides[cur].classList.remove('active', 'exit');
+    }
+    cur=n;
+    slides[cur].classList.add('active');
+    document.querySelectorAll('.cr-dot').forEach((d,i)=>{
+      d.className='cr-dot'+(i===cur?' on':'');
+    });
+    setNavState();
+    if (updateQuery) syncQueryParam();
+  }
+
+  function navigate(dir){
+    const n=cur+dir;
+    if(n>=0&&n<total) goTo(n);
+  }
+
+  function setStatus(message) {
+    exportStatus.textContent = message || '';
+  }
+
+  function initializeFromQuery() {
+    const url = new URL(window.location.href);
+    const slideParam = Number(url.searchParams.get('slide'));
+    if (Number.isInteger(slideParam) && slideParam >= 1 && slideParam <= total) {
+      goTo(slideParam - 1, { animate: false, updateQuery: false });
+    } else {
+      syncQueryParam();
+    }
+  }
+
+  function downloadBlob(blob, fileName) {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  async function renderSlideToBlob(slide, index) {
+    exportRoot.replaceChildren();
+
+    const frame = document.createElement('div');
+    frame.className = 'export-frame';
+
+    const clone = slide.cloneNode(true);
+    clone.classList.remove('exit');
+    clone.classList.add('active');
+    frame.appendChild(clone);
+    exportRoot.appendChild(frame);
+
+    await document.fonts.ready;
+
+    const canvas = await html2canvas(frame, {
+      backgroundColor: null,
+      useCORS: true,
+      scale: Number(getComputedStyle(document.documentElement).getPropertyValue('--ig-export-scale')) || 2,
+      width: frame.clientWidth,
+      height: frame.clientHeight,
+      logging: false
+    });
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('PNG export failed for slide ' + (index + 1)));
+          return;
+        }
+        resolve(blob);
+      }, 'image/png');
+    });
+  }
+
+  async function downloadAllSlides() {
+    if (isExporting) return;
+    if (!window.html2canvas || !window.JSZip) {
+      setStatus('Export libraries failed to load. Refresh once and try again.');
+      return;
+    }
+
+    isExporting = true;
+    downloadAllBtn.disabled = true;
+    setStatus('Preparing 8 Instagram slides...');
+
+    try {
+      const zip = new JSZip();
+
+      for (let i = 0; i < slides.length; i++) {
+        setStatus(`Rendering slide ${i + 1} of ${slides.length}...`);
+        const blob = await renderSlideToBlob(slides[i], i);
+        zip.file(`career-ops-slide-${String(i + 1).padStart(2, '0')}.png`, blob);
+      }
+
+      exportRoot.replaceChildren();
+      setStatus('Compressing PNG set...');
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      downloadBlob(zipBlob, 'career-ops-instagram-carousel.zip');
+      setStatus('PNG set downloaded.');
+    } catch (error) {
+      console.error(error);
+      setStatus('Export failed. Open the file in a browser with internet access and try again.');
+    } finally {
+      isExporting = false;
+      downloadAllBtn.disabled = false;
+      exportRoot.replaceChildren();
+    }
+  }
+
+  setNavState();
+  initializeFromQuery();
+
+  let startX=0;
+  phone.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
+  phone.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-startX;
+    if(Math.abs(dx)>40) navigate(dx<0?1:-1);
+  },{passive:true});
+
+  let mouseX=0;
+  phone.addEventListener('mousedown',e=>{mouseX=e.clientX;});
+  phone.addEventListener('mouseup',e=>{
+    const dx=e.clientX-mouseX;
+    if(Math.abs(dx)>40) navigate(dx<0?1:-1);
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') navigate(-1);
+    if (event.key === 'ArrowRight') navigate(1);
+  });
+</script>
+</body>
+</html>

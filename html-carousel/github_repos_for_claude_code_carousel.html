@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Repos for Claude Code</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --ig-width: 540px;
+      --ig-height: 675px;
+      --ig-export-scale: 2;
+      --bg: #1a1a1a;
+      --surface: #242424;
+      --surface-2: #2b2b2b;
+      --surface-3: #313131;
+      --ink: #f5f5f0;
+      --muted: rgba(245, 245, 240, 0.68);
+      --line: rgba(255, 255, 255, 0.08);
+      --line-soft: rgba(255, 255, 255, 0.04);
+      --accent: #d85a30;
+      --accent-soft: rgba(216, 90, 48, 0.18);
+      --blue-soft: rgba(104, 121, 255, 0.14);
+      --violet-soft: rgba(154, 122, 255, 0.12);
+      --font-ui: "Inter", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 14% 12%, rgba(216, 90, 48, 0.12), transparent 22%),
+        radial-gradient(circle at 84% 16%, rgba(112, 123, 255, 0.1), transparent 18%),
+        #1a1a1a;
+      color: var(--ink);
+      font-family: var(--font-ui);
+    }
+
+    body.light-mode {
+      --bg: #f4efe6;
+      --surface: #fffaf2;
+      --surface-2: #f2eadd;
+      --surface-3: #ece2d3;
+      --ink: #17181d;
+      --muted: rgba(23, 24, 29, 0.66);
+      --line: rgba(23, 24, 29, 0.1);
+      --line-soft: rgba(23, 24, 29, 0.05);
+      background:
+        radial-gradient(circle at 14% 12%, rgba(216, 90, 48, 0.1), transparent 22%),
+        radial-gradient(circle at 84% 16%, rgba(112, 123, 255, 0.08), transparent 18%),
+        #efe6d7;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .cr-root {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 28px 16px 36px;
+      user-select: none;
+    }
+
+    .cr-toolbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .cr-copy {
+      max-width: 360px;
+    }
+
+    .cr-meta-label {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(245, 245, 240, 0.52);
+    }
+
+    .cr-meta-title {
+      margin-top: 8px;
+      font-size: 34px;
+      line-height: 0.94;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+    }
+
+    .cr-meta-sub {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: 360px;
+    }
+
+    .cr-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .cr-btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.18s ease, opacity 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .cr-btn:hover:not(:disabled) {
+      background: var(--surface-3);
+    }
+
+    .cr-btn:disabled {
+      opacity: 0.58;
+      cursor: progress;
+    }
+
+    .theme-btn {
+      background: var(--accent);
+      border-color: transparent;
+      color: #fff7f1;
+    }
+
+    .theme-btn:hover:not(:disabled) {
+      background: #c34b23;
+    }
+
+    .cr-status {
+      min-height: 18px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: rgba(245, 245, 240, 0.62);
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: 592px;
+      margin: 0 auto;
+      padding: 14px;
+      border-radius: 36px;
+      background: #212123;
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .stage::before,
+    .stage::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .stage::before {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      border: 1px solid rgba(104, 121, 255, 0.22);
+      left: -12px;
+      top: 38px;
+      transform: rotate(-12deg);
+    }
+
+    .stage::after {
+      width: 122px;
+      height: 122px;
+      border-radius: 999px;
+      border: 1px dashed rgba(255, 255, 255, 0.12);
+      right: -26px;
+      bottom: -30px;
+    }
+
+    .cr-phone {
+      width: 100%;
+      max-width: var(--ig-width);
+      aspect-ratio: 4 / 5;
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      margin: 0 auto;
+      background: #151518;
+      border: 1px solid var(--line);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 22px;
+      opacity: 0;
+      transform: translateX(36px);
+      transition: opacity 0.34s ease, transform 0.34s ease;
+      pointer-events: none;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      --soft: var(--accent-soft);
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .slide.exit {
+      opacity: 0;
+      transform: translateX(-36px);
+    }
+
+    .tone-core { --soft: rgba(216, 90, 48, 0.16); }
+    .tone-slate { --soft: rgba(104, 121, 255, 0.15); }
+    .tone-mauve { --soft: rgba(154, 122, 255, 0.14); }
+    .tone-stone { --soft: rgba(216, 90, 48, 0.1); }
+
+    .slide::before,
+    .slide::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .slide::before {
+      width: 190px;
+      height: 190px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--line-soft);
+      top: 48px;
+      right: -56px;
+      transform: rotate(18deg);
+    }
+
+    .slide::after {
+      width: 164px;
+      height: 164px;
+      border-radius: 50%;
+      background: var(--soft);
+      right: 4px;
+      bottom: 18px;
+    }
+
+    .sl-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand,
+    .handle,
+    .slide-save {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(245,245,240,0.76);
+    }
+
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--soft);
+    }
+
+    .handle {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .slide-save {
+      appearance: none;
+      cursor: pointer;
+      font-weight: 700;
+      display: none;
+    }
+
+    .slide-save:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .brand-minimal {
+      min-width: 34px;
+      padding: 8px 10px;
+      gap: 0;
+    }
+
+    .sl-main {
+      position: relative;
+      z-index: 1;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      min-height: 0;
+      padding-bottom: 6px;
+    }
+
+    .slide:first-of-type .sl-main {
+      gap: 10px;
+      padding-bottom: 12px;
+    }
+
+    .hero-title,
+    .section-title,
+    .card-title,
+    .big-number,
+    .cta-title {
+      letter-spacing: -0.05em;
+      color: var(--ink);
+      margin: 0;
+      font-weight: 800;
+    }
+
+    .hero-title {
+      font-size: 55px;
+      line-height: 0.92;
+      max-width: 430px;
+    }
+
+    .slide:first-of-type .hero-title {
+      font-size: 50px;
+      line-height: 0.91;
+      max-width: 392px;
+    }
+
+    .section-title {
+      font-size: 38px;
+      line-height: 0.96;
+      max-width: 470px;
+    }
+
+    .body-copy {
+      font-size: 15px;
+      line-height: 1.54;
+      color: var(--muted);
+      max-width: 456px;
+    }
+
+    .slide:first-of-type .body-copy {
+      font-size: 14px;
+      line-height: 1.48;
+      max-width: 420px;
+    }
+
+    .body-copy strong {
+      color: var(--ink);
+    }
+
+    .accent-line {
+      width: 104px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.12fr 0.88fr;
+      gap: 10px;
+      align-items: stretch;
+      margin-top: auto;
+    }
+
+    .slide:first-of-type .hero-grid {
+      grid-template-columns: 1.18fr 0.82fr;
+      gap: 8px;
+    }
+
+    .hero-card,
+    .metric-card,
+    .repo-card,
+    .feature-card,
+    .intro-note,
+    .summary-item,
+    .cta-box {
+      position: relative;
+      z-index: 1;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .hero-card {
+      min-height: 164px;
+      background: #111317;
+      color: #f5f7fb;
+      padding: 13px;
+    }
+
+    .slide:first-of-type .hero-card {
+      min-height: 148px;
+      padding: 12px;
+    }
+
+    .window-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.58);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .window-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .window-dots span:nth-child(1) { background: #ff7c61; }
+    .window-dots span:nth-child(2) { background: #ffca5f; }
+    .window-dots span:nth-child(3) { background: #31c574; }
+
+    .code {
+      font-size: 11px;
+      line-height: 1.46;
+      color: #d9e0f7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .slide:first-of-type .code {
+      font-size: 10.5px;
+      line-height: 1.38;
+    }
+
+    .metric-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .slide:first-of-type .metric-grid {
+      gap: 7px;
+    }
+
+    .metric-card {
+      padding: 11px;
+      min-height: 74px;
+      background: var(--surface);
+    }
+
+    .slide:first-of-type .metric-card {
+      min-height: 66px;
+      padding: 10px;
+    }
+
+    .big-number {
+      font-size: 25px;
+      line-height: 1;
+      margin-top: 3px;
+    }
+
+    .slide:first-of-type .big-number {
+      font-size: 22px;
+    }
+
+    .mini-label {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .card-copy {
+      margin-top: 5px;
+      font-size: 10.5px;
+      line-height: 1.38;
+      color: var(--muted);
+    }
+
+    .slide:first-of-type .card-copy {
+      font-size: 9.8px;
+      line-height: 1.3;
+      margin-top: 4px;
+    }
+
+    .intro-board {
+      display: grid;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .intro-note {
+      padding: 13px;
+      font-size: 12.5px;
+      line-height: 1.52;
+      color: var(--muted);
+    }
+
+    .feature-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .feature-card {
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 9px;
+      align-items: start;
+      padding: 13px;
+    }
+
+    .feature-icon,
+    .repo-icon,
+    .summary-icon {
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+    }
+
+    .feature-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+    }
+
+    .feature-icon svg,
+    .repo-icon svg,
+    .summary-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .feature-title,
+    .summary-title {
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.24;
+      color: var(--ink);
+    }
+
+    .feature-copy,
+    .summary-copy {
+      margin-top: 3px;
+      font-size: 11.5px;
+      line-height: 1.48;
+      color: var(--muted);
+    }
+
+    .repo-slide-copy {
+      font-size: 12.5px;
+      line-height: 1.48;
+      color: var(--muted);
+      max-width: 470px;
+    }
+
+    .repo-card {
+      display: grid;
+      grid-template-columns: 142px 1fr;
+      min-height: 232px;
+      margin-top: auto;
+    }
+
+    .slide:nth-of-type(n+3):nth-of-type(-n+9) .sl-main {
+      gap: 14px;
+      padding-bottom: 10px;
+    }
+
+    .slide:nth-of-type(n+3):nth-of-type(-n+9) .repo-card {
+      min-height: 286px;
+      margin-top: 8px;
+    }
+
+    .repo-accent {
+      position: relative;
+      background: var(--accent);
+      color: #fff7f1;
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .repo-rank {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.88;
+      font-weight: 700;
+    }
+
+    .repo-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.18);
+      color: #fff7f1;
+    }
+
+    .repo-name {
+      font-size: 26px;
+      line-height: 0.94;
+      letter-spacing: -0.05em;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .repo-panel {
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      background: var(--surface);
+    }
+
+    .repo-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .meta-chip,
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      color: rgba(245,245,240,0.72);
+      font-size: 9.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .repo-desc {
+      font-size: 13.5px;
+      line-height: 1.52;
+      color: var(--muted);
+    }
+
+    .repo-link {
+      font-size: 12px;
+      line-height: 1.42;
+      color: var(--accent);
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .repo-why {
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      font-size: 11.5px;
+      line-height: 1.44;
+      color: var(--muted);
+    }
+
+    .repo-why strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .repo-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .cta-layout {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 10px;
+      align-items: stretch;
+      margin-top: auto;
+    }
+
+    .cta-box,
+    .summary-panel {
+      padding: 15px;
+    }
+
+    .cta-title {
+      font-size: 50px;
+      line-height: 0.94;
+      max-width: 420px;
+    }
+
+    .slide:last-of-type .sl-main {
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+
+    .slide:last-of-type .cta-title {
+      font-size: 44px;
+      max-width: 392px;
+    }
+
+    .cta-copy {
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.52;
+      color: var(--muted);
+      max-width: 420px;
+    }
+
+    .slide:last-of-type .cta-copy {
+      font-size: 13px;
+      line-height: 1.44;
+      max-width: 392px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .summary-panel {
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      display: grid;
+      gap: 8px;
+    }
+
+    .slide:last-of-type .cta-layout {
+      gap: 8px;
+      grid-template-columns: 1.02fr 0.98fr;
+    }
+
+    .slide:last-of-type .cta-box,
+    .slide:last-of-type .summary-panel {
+      padding: 13px;
+    }
+
+    .slide:last-of-type .card-title {
+      font-size: 28px !important;
+      line-height: 0.98;
+    }
+
+    .summary-head {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+      font-size: 9.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(245,245,240,0.72);
+      font-weight: 700;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .slide:last-of-type .summary-list {
+      gap: 6px;
+    }
+
+    .summary-item {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 9px;
+      align-items: start;
+      padding: 11px;
+    }
+
+    .slide:last-of-type .summary-item {
+      grid-template-columns: 32px 1fr;
+      gap: 8px;
+      padding: 9px;
+    }
+
+    .summary-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+    }
+
+    .slide:last-of-type .summary-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+    }
+
+    .slide:last-of-type .summary-title {
+      font-size: 12px;
+      line-height: 1.18;
+    }
+
+    .slide:last-of-type .summary-copy {
+      font-size: 10.5px;
+      line-height: 1.34;
+      margin-top: 2px;
+    }
+
+    .sl-footer {
+      margin-top: auto;
+      padding-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 9.5px;
+      color: rgba(245,245,240,0.52);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    .footer-handle {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .sl-page {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 9.5px;
+      color: rgba(245,245,240,0.54);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .sl-page-bar {
+      width: 72px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+
+    .sl-page-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .cr-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .cr-nav-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .cr-nav-btn:hover:not(:disabled) {
+      background: var(--surface-2);
+      transform: translateY(-1px);
+    }
+
+    .cr-nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .cr-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .cr-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.22);
+      transition: transform 0.22s ease, background 0.22s ease, width 0.22s ease;
+    }
+
+    .cr-dot.on {
+      width: 22px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    body.light-mode .stage {
+      background: rgba(255,255,255,0.74);
+    }
+
+    body.light-mode .cr-phone {
+      background: rgba(255,255,255,0.68);
+    }
+
+    body.light-mode .brand,
+    body.light-mode .handle,
+    body.light-mode .slide-save,
+    body.light-mode .summary-head,
+    body.light-mode .meta-chip,
+    body.light-mode .tag,
+    body.light-mode .feature-icon,
+    body.light-mode .summary-icon {
+      background: rgba(255,255,255,0.72);
+    }
+
+    body.light-mode .hero-card {
+      background: #181a1f;
+    }
+
+    body.light-mode .cr-nav-btn {
+      background: rgba(255,255,255,0.8);
+    }
+
+    body.light-mode .cr-dot {
+      background: rgba(23,24,29,0.18);
+    }
+
+    .export-root {
+      position: fixed;
+      inset: 0;
+      left: -99999px;
+      top: -99999px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .export-frame {
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      position: relative;
+      background: transparent;
+    }
+
+    .export-shell {
+      position: relative;
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 14% 12%, rgba(216, 90, 48, 0.12), transparent 22%),
+        radial-gradient(circle at 84% 16%, rgba(112, 123, 255, 0.1), transparent 18%),
+        #1a1a1a;
+    }
+
+    .export-shell::before,
+    .export-shell::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .export-shell::before {
+      width: 180px;
+      height: 180px;
+      border-radius: 42px;
+      border: 1px solid rgba(104, 121, 255, 0.22);
+      left: 60px;
+      top: 210px;
+      transform: rotate(-12deg);
+    }
+
+    .export-shell::after {
+      width: 210px;
+      height: 210px;
+      border-radius: 999px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      right: 46px;
+      bottom: 84px;
+    }
+
+    .export-stage {
+      position: absolute;
+      left: 58px;
+      right: 58px;
+      top: 78px;
+      bottom: 78px;
+      padding: 24px;
+      border-radius: 52px;
+      background: #212123;
+      border: 1px solid var(--line);
+    }
+
+    .export-phone {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 44px;
+      overflow: hidden;
+      background: #151518;
+      border: 1px solid var(--line);
+    }
+
+    .export-phone .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+      border-radius: 44px;
+      padding: 44px;
+    }
+
+    .export-phone .hero-title,
+    .export-phone .cta-title {
+      font-size: 84px;
+      max-width: 720px;
+    }
+
+    .export-phone .section-title {
+      font-size: 56px;
+      max-width: 720px;
+    }
+
+    .export-phone .body-copy,
+    .export-phone .repo-slide-copy,
+    .export-phone .repo-desc,
+    .export-phone .cta-copy {
+      font-size: 20px;
+      line-height: 1.58;
+      max-width: 720px;
+    }
+
+    .export-phone .hero-grid,
+    .export-phone .cta-layout {
+      gap: 20px;
+    }
+
+    .export-phone .metric-card,
+    .export-phone .hero-card,
+    .export-phone .summary-item,
+    .export-phone .feature-card,
+    .export-phone .intro-note,
+    .export-phone .repo-card,
+    .export-phone .cta-box,
+    .export-phone .summary-panel {
+      border-radius: 28px;
+    }
+
+    .export-phone .metric-card,
+    .export-phone .intro-note,
+    .export-phone .feature-card,
+    .export-phone .summary-item,
+    .export-phone .cta-box,
+    .export-phone .summary-panel {
+      padding: 22px;
+    }
+
+    .export-phone .repo-card {
+      grid-template-columns: 224px 1fr;
+      min-height: 408px;
+    }
+
+    .export-phone .repo-accent,
+    .export-phone .repo-panel {
+      padding: 22px;
+    }
+
+    .export-phone .repo-name {
+      font-size: 42px;
+    }
+
+    .export-phone .meta-chip,
+    .export-phone .tag,
+    .export-phone .brand,
+    .export-phone .handle,
+    .export-phone .slide-save,
+    .export-phone .footer-left,
+    .export-phone .sl-page,
+    .export-phone .summary-head {
+      font-size: 14px;
+    }
+
+    .export-phone .repo-why,
+    .export-phone .feature-copy,
+    .export-phone .summary-copy,
+    .export-phone .card-copy {
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .export-phone .feature-title,
+    .export-phone .summary-title,
+    .export-phone .repo-link {
+      font-size: 18px;
+    }
+
+    .export-phone .mini-label {
+      font-size: 12px;
+    }
+
+    .export-phone .big-number {
+      font-size: 38px;
+    }
+
+    .export-phone .sl-page-bar {
+      width: 120px;
+      height: 6px;
+    }
+
+    .export-phone .repo-icon,
+    .export-phone .summary-icon,
+    .export-phone .feature-icon {
+      width: 58px;
+      height: 58px;
+    }
+
+    .export-phone .repo-icon svg,
+    .export-phone .summary-icon svg,
+    .export-phone .feature-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    body.export-mode .cr-toolbar,
+    body.export-mode .cr-status,
+    body.export-mode .cr-nav {
+      display: none;
+    }
+
+    body.export-mode .cr-root {
+      max-width: none;
+      padding: 0;
+    }
+
+    body.export-mode .stage {
+      width: 1080px;
+      max-width: none;
+      padding: 24px;
+      border-radius: 52px;
+      margin: 0 auto;
+    }
+
+    body.export-mode .cr-phone {
+      width: 100%;
+      max-width: none;
+      border-radius: 44px;
+    }
+
+    body.export-mode .slide {
+      padding: 44px;
+    }
+
+    body.export-mode .hero-title,
+    body.export-mode .cta-title {
+      font-size: 84px;
+      max-width: 720px;
+    }
+
+    body.export-mode .section-title {
+      font-size: 56px;
+      max-width: 720px;
+    }
+
+    body.export-mode .body-copy,
+    body.export-mode .repo-slide-copy,
+    body.export-mode .repo-desc,
+    body.export-mode .cta-copy {
+      font-size: 20px;
+      line-height: 1.58;
+      max-width: 720px;
+    }
+
+    body.export-mode .repo-card {
+      grid-template-columns: 224px 1fr;
+      min-height: 408px;
+    }
+
+    body.export-mode .repo-accent,
+    body.export-mode .repo-panel {
+      padding: 22px;
+    }
+
+    body.export-mode .repo-name {
+      font-size: 42px;
+    }
+
+    body.export-mode .meta-chip,
+    body.export-mode .tag,
+    body.export-mode .brand,
+    body.export-mode .handle,
+    body.export-mode .slide-save,
+    body.export-mode .footer-left,
+    body.export-mode .sl-page,
+    body.export-mode .summary-head {
+      font-size: 14px;
+    }
+
+    body.export-mode .repo-why,
+    body.export-mode .feature-copy,
+    body.export-mode .summary-copy,
+    body.export-mode .card-copy {
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    body.export-mode .feature-title,
+    body.export-mode .summary-title,
+    body.export-mode .repo-link {
+      font-size: 18px;
+    }
+
+    body.export-mode .sl-page-bar {
+      width: 120px;
+      height: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="cr-root">
+    <div class="cr-toolbar">
+      <div class="cr-copy">
+        <div class="cr-meta-label">Useful Repo Reel / Claude Code</div>
+        <div class="cr-meta-title">GitHub repos for Claude Code that are actually worth saving.</div>
+        <div class="cr-meta-sub">Official repos first, community tooling second. A tighter 10-slide stack for developers who already use Claude Code and want the setup around it.</div>
+      </div>
+      <div class="cr-actions">
+        <button class="cr-btn theme-btn" id="themeToggle" type="button">Toggle Theme</button>
+        <button class="cr-btn" id="saveAllBtn" type="button">Save All</button>
+        <button class="cr-btn" id="saveCurrentBtn" type="button">Save Current</button>
+      </div>
+    </div>
+
+    <div class="cr-status" id="exportStatus"></div>
+
+    <div class="stage">
+      <div class="cr-phone" id="phone">
+        <!-- SLIDE 1 -->
+        <section class="slide tone-core active">
+          <div class="sl-topbar">
+            <div class="brand brand-minimal"><span class="brand-dot"></span></div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <div class="accent-line"></div>
+            <h1 class="hero-title">GitHub repos that make <span style="color:var(--accent)">Claude Code</span> feel complete.</h1>
+            <p class="body-copy"><strong>Not just the CLI.</strong> This is the repo stack around it: official tooling, routing, SDKs, MCP bridges, and the ecosystem map worth bookmarking.</p>
+
+            <div class="hero-grid">
+              <div class="hero-card">
+                <div class="window-bar">
+                  <div class="window-dots"><span></span><span></span><span></span></div>
+                  <span>repo checklist</span>
+                </div>
+                <div class="code">01  anthropics/claude-code
+02  anthropics/skills
+03  anthropics/claude-code-action
+04  anthropics/claude-agent-sdk-python
+05  musistudio/claude-code-router
+06  steipete/claude-code-mcp
+07  hesreallyhim/awesome-claude-code</div>
+              </div>
+
+              <div class="metric-grid">
+                <div class="metric-card">
+                  <div class="mini-label">Official First</div>
+                  <div class="big-number">4</div>
+                  <div class="card-copy">Anthropic repos to open before community tooling.</div>
+                </div>
+                <div class="metric-card">
+                  <div class="mini-label">Power Layer</div>
+                  <div class="big-number">3</div>
+                  <div class="card-copy">Routing, MCP, plus the ecosystem map.</div>
+                </div>
+                <div class="metric-card">
+                  <div class="mini-label">Best For</div>
+                  <div class="big-number">CLI</div>
+                  <div class="card-copy">Built for devs already using Claude Code weekly.</div>
+                </div>
+                <div class="metric-card">
+                  <div class="mini-label">Why Save</div>
+                  <div class="big-number">Now</div>
+                  <div class="card-copy">Save it before your setup becomes layered.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>repo stack</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:10%;"></div></div><span>01 / 10</span></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 2 -->
+        <section class="slide tone-slate">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Context</div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">Claude Code gets better when you add the right layer around it.</h2>
+            <p class="body-copy">Most people install the CLI and stop there. The real jump happens when you connect it to <strong>GitHub automation</strong>, <strong>skills</strong>, <strong>routing</strong>, and <strong>MCP-friendly workflows</strong>.</p>
+
+            <div class="intro-board">
+              <div class="intro-note">This carousel is intentionally practical: one repo per slide, with star count, language, direct GitHub link, and the reason it deserves a tab in your browser.</div>
+              <div class="intro-note">If you already use Claude Code in the terminal, these repos turn it from a single tool into a proper workflow stack.</div>
+              <div class="feature-grid">
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M8 7h8M8 12h8M8 17h5"/><path d="M5 4h14v16H5z"/></svg>
+                  </div>
+                  <div><div class="feature-title">Official Base</div><div class="feature-copy">Start with what Anthropic ships, not wrappers first.</div></div>
+                </div>
+                <div class="feature-card">
+                  <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M3 12h18"/><circle cx="12" cy="12" r="3"/></svg>
+                  </div>
+                  <div><div class="feature-title">Real Extensions</div><div class="feature-copy">Then add routing, SDKs, skills, and MCP bridges where needed.</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>why this matters</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:20%;"></div></div><span>02 / 10</span></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 3 -->
+        <section class="slide tone-core">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Repo 01</div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">Start with the official Claude Code repo.</h2>
+            <p class="repo-slide-copy">If you only open one repo first, open the official one.</p>
+
+            <div class="repo-card">
+              <div class="repo-accent">
+                <div class="repo-rank">01 / Official CLI</div>
+                <div class="repo-icon"><svg viewBox="0 0 24 24"><path d="m9 18-6-6 6-6"/><path d="m15 6 6 6-6 6"/></svg></div>
+                <h3 class="repo-name">claude-code</h3>
+              </div>
+              <div class="repo-panel">
+                <div class="repo-meta">
+                  <span class="meta-chip">⭐ 113k</span>
+                  <span class="meta-chip">Shell</span>
+                  <span class="meta-chip">Anthropic</span>
+                </div>
+                <div class="repo-desc">Anthropic’s main Claude Code repository. This is the actual terminal tool, plus the repo you want for docs, setup direction, examples, and the official product surface.</div>
+                <a class="repo-link" href="https://github.com/anthropics/claude-code" target="_blank" rel="noreferrer">github.com/anthropics/claude-code ↗</a>
+                <div class="repo-why"><strong>Why it matters</strong>Use this as the source of truth before adding routing, wrappers, or community tooling.</div>
+                <div class="repo-tags">
+                  <span class="tag">Official</span>
+                  <span class="tag">CLI</span>
+                  <span class="tag">Examples</span>
+                  <span class="tag">Terminal</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>official base</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:30%;"></div></div><span>03 / 10</span></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 4 -->
+        <section class="slide tone-stone">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Repo 02</div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">Use this repo when you want Claude Code to specialize.</h2>
+            <p class="repo-slide-copy">This is the official path for adding focused capability, not random one-off prompts.</p>
+
+            <div class="repo-card">
+              <div class="repo-accent">
+                <div class="repo-rank">02 / Skills</div>
+                <div class="repo-icon"><svg viewBox="0 0 24 24"><path d="M12 3 4 7v5c0 5 3.5 7.5 8 9 4.5-1.5 8-4 8-9V7z"/><path d="m9.5 12 2 2 3.5-4"/></svg></div>
+                <h3 class="repo-name">skills</h3>
+              </div>
+              <div class="repo-panel">
+                <div class="repo-meta">
+                  <span class="meta-chip">⭐ 115k</span>
+                  <span class="meta-chip">Python</span>
+                  <span class="meta-chip">Marketplace</span>
+                </div>
+                <div class="repo-desc">Anthropic’s public Agent Skills repo. It shows how to register a Claude Code plugin marketplace and install skill bundles that extend what Claude Code can do for specific workflows.</div>
+                <a class="repo-link" href="https://github.com/anthropics/skills" target="_blank" rel="noreferrer">github.com/anthropics/skills ↗</a>
+                <div class="repo-why"><strong>Why it matters</strong>This is the cleanest way to push Claude Code toward specialized tasks instead of using it the same way every time.</div>
+                <div class="repo-tags">
+                  <span class="tag">Skills</span>
+                  <span class="tag">Plugin Market</span>
+                  <span class="tag">Customization</span>
+                  <span class="tag">Workflows</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>specialization layer</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:40%;"></div></div><span>04 / 10</span></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 5 -->
+        <section class="slide tone-slate">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Repo 03</div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">This is the GitHub automation repo to save.</h2>
+            <p class="repo-slide-copy">The moment Claude Code moves into pull requests and issues, this repo matters.</p>
+
+            <div class="repo-card">
+              <div class="repo-accent">
+                <div class="repo-rank">03 / Actions</div>
+                <div class="repo-icon"><svg viewBox="0 0 24 24"><path d="M8 6h8"/><path d="M8 12h8"/><path d="M8 18h8"/><path d="M5 6h.01M5 12h.01M5 18h.01"/></svg></div>
+                <h3 class="repo-name">claude-code-action</h3>
+              </div>
+              <div class="repo-panel">
+                <div class="repo-meta">
+                  <span class="meta-chip">⭐ 7k</span>
+                  <span class="meta-chip">TypeScript</span>
+                  <span class="meta-chip">Automation</span>
+                </div>
+                <div class="repo-desc">A general-purpose GitHub Action for Claude Code. Use it on PRs and issues when you want Claude to answer questions, review code, or implement changes inside your repo workflow.</div>
+                <a class="repo-link" href="https://github.com/anthropics/claude-code-action" target="_blank" rel="noreferrer">github.com/anthropics/claude-code-action ↗</a>
+                <div class="repo-why"><strong>Why it matters</strong>This is the repo that moves Claude Code from solo usage into team and CI workflows.</div>
+                <div class="repo-tags">
+                  <span class="tag">PR Review</span>
+                  <span class="tag">Issue Triage</span>
+                  <span class="tag">CI</span>
+                  <span class="tag">GitHub Runner</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>github automation</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:50%;"></div></div><span>05 / 10</span></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 6 -->
+        <section class="slide tone-mauve">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Repo 04</div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">If you want programmable Claude workflows, use the Python SDK repo.</h2>
+            <p class="repo-slide-copy">This is the repo to use when Claude Code becomes part of your own tooling.</p>
+
+            <div class="repo-card">
+              <div class="repo-accent">
+                <div class="repo-rank">04 / SDK</div>
+                <div class="repo-icon"><svg viewBox="0 0 24 24"><path d="M9 4h6l3 3v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 12h6M9 16h4"/></svg></div>
+                <h3 class="repo-name">claude-agent-sdk-python</h3>
+              </div>
+              <div class="repo-panel">
+                <div class="repo-meta">
+                  <span class="meta-chip">⭐ 6.3k</span>
+                  <span class="meta-chip">Python</span>
+                  <span class="meta-chip">SDK</span>
+                </div>
+                <div class="repo-desc">Anthropic’s Python SDK for Claude Agent, bundled with the Claude Code CLI. Useful for query flows, hooks, interactive clients, and in-process MCP servers inside Python tooling.</div>
+                <a class="repo-link" href="https://github.com/anthropics/claude-agent-sdk-python" target="_blank" rel="noreferrer">github.com/anthropics/claude-agent-sdk-python ↗</a>
+                <div class="repo-why"><strong>Why it matters</strong>Pick this repo when you want Claude behavior inside your own scripts, services, or product logic.</div>
+                <div class="repo-tags">
+                  <span class="tag">Python Apps</span>
+                  <span class="tag">Hooks</span>
+                  <span class="tag">SDK MCP</span>
+                  <span class="tag">Programmable</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>programmable layer</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:60%;"></div></div><span>06 / 10</span></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 7 -->
+        <section class="slide tone-core">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Repo 05</div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">This is the big routing repo everyone finds eventually.</h2>
+            <p class="repo-slide-copy">Once provider flexibility matters, this is usually the next important tab.</p>
+
+            <div class="repo-card">
+              <div class="repo-accent">
+                <div class="repo-rank">05 / Router</div>
+                <div class="repo-icon"><svg viewBox="0 0 24 24"><path d="M4 7h6v4H4zM14 13h6v4h-6zM10 9h4M12 9v4"/></svg></div>
+                <h3 class="repo-name">claude-code-router</h3>
+              </div>
+              <div class="repo-panel">
+                <div class="repo-meta">
+                  <span class="meta-chip">⭐ 32k</span>
+                  <span class="meta-chip">TypeScript</span>
+                  <span class="meta-chip">Routing</span>
+                </div>
+                <div class="repo-desc">A routing layer built around Claude Code. It lets people keep the Claude Code experience while switching providers, changing request handling, and adding more infrastructure control.</div>
+                <a class="repo-link" href="https://github.com/musistudio/claude-code-router" target="_blank" rel="noreferrer">github.com/musistudio/claude-code-router ↗</a>
+                <div class="repo-why"><strong>Why it matters</strong>This is the community repo most people reach once they care about model routing and provider flexibility.</div>
+                <div class="repo-tags">
+                  <span class="tag">Multi Provider</span>
+                  <span class="tag">Dynamic Switching</span>
+                  <span class="tag">Infra</span>
+                  <span class="tag">Power Users</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>routing layer</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:70%;"></div></div><span>07 / 10</span></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 8 -->
+        <section class="slide tone-slate">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Repo 06</div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">Use this repo when another client still needs Claude Code underneath.</h2>
+            <p class="repo-slide-copy">This one matters more in agent-heavy setups than in regular day-one use.</p>
+
+            <div class="repo-card">
+              <div class="repo-accent">
+                <div class="repo-rank">06 / MCP</div>
+                <div class="repo-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 12h8M16.5 7.5 8 11M16.5 16.5 8 13"/></svg></div>
+                <h3 class="repo-name">claude-code-mcp</h3>
+              </div>
+              <div class="repo-panel">
+                <div class="repo-meta">
+                  <span class="meta-chip">⭐ 1.2k</span>
+                  <span class="meta-chip">JavaScript</span>
+                  <span class="meta-chip">MCP</span>
+                </div>
+                <div class="repo-desc">An MCP server that runs Claude Code in one-shot mode and exposes a unified tool for MCP-compatible clients. Useful when you want Claude Code as a capability inside another system.</div>
+                <a class="repo-link" href="https://github.com/steipete/claude-code-mcp" target="_blank" rel="noreferrer">github.com/steipete/claude-code-mcp ↗</a>
+                <div class="repo-why"><strong>Why it matters</strong>Useful for agent-heavy setups where Claude Code needs to sit under a different client or orchestration layer.</div>
+                <div class="repo-tags">
+                  <span class="tag">MCP Server</span>
+                  <span class="tag">Delegation</span>
+                  <span class="tag">Agent in Agent</span>
+                  <span class="tag">Bridge</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>mcp bridge</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:80%;"></div></div><span>08 / 10</span></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 9 -->
+        <section class="slide tone-stone">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Repo 07</div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">If you only save one ecosystem repo, save this curated list.</h2>
+            <p class="repo-slide-copy">Best when you want the wider Claude Code ecosystem map without hunting repo by repo.</p>
+
+            <div class="repo-card">
+              <div class="repo-accent">
+                <div class="repo-rank">07 / Curated List</div>
+                <div class="repo-icon"><svg viewBox="0 0 24 24"><path d="M6 6h12M6 12h12M6 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg></div>
+                <h3 class="repo-name">awesome-claude-code</h3>
+              </div>
+              <div class="repo-panel">
+                <div class="repo-meta">
+                  <span class="meta-chip">⭐ 38k</span>
+                  <span class="meta-chip">Python</span>
+                  <span class="meta-chip">Index</span>
+                </div>
+                <div class="repo-desc">A curated list of Claude Code skills, agents, plugins, hooks, slash commands, and tools. If you want the ecosystem map instead of one repo at a time, this is the right entry point.</div>
+                <a class="repo-link" href="https://github.com/hesreallyhim/awesome-claude-code" target="_blank" rel="noreferrer">github.com/hesreallyhim/awesome-claude-code ↗</a>
+                <div class="repo-why"><strong>Why it matters</strong>Best starting point for discovery once you know the official repos and want the wider ecosystem map.</div>
+                <div class="repo-tags">
+                  <span class="tag">Curated</span>
+                  <span class="tag">Hooks</span>
+                  <span class="tag">Skills</span>
+                  <span class="tag">Workflow Map</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>ecosystem index</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:90%;"></div></div><span>09 / 10</span></div>
+          </div>
+        </section>
+
+        <!-- SLIDE 10 -->
+        <section class="slide tone-mauve">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Save This Stack</div>
+            <div class="topbar-right">
+              <div class="handle">@rk.codex</div>
+            </div>
+          </div>
+
+          <div class="sl-main">
+            <div class="accent-line"></div>
+            <h2 class="cta-title">Save this before your Claude Code setup gets messy.</h2>
+            <p class="cta-copy">Follow <strong>@rk.codex</strong> for more practical AI + dev carousels, repo stacks, and workflows that help serious builders move faster.</p>
+
+            <div class="cta-layout">
+              <div class="cta-box">
+                <div class="mini-label">What You Get</div>
+                <div class="card-title" style="font-size:34px;">Follow for actual useful dev tooling.</div>
+                <div class="cta-copy" style="margin-top:8px;">No vague AI hype. Just practical repo lists, terminal workflows, and tools that save real time.</div>
+                <div class="tag-row">
+                  <span class="tag">Save</span>
+                  <span class="tag">Share</span>
+                  <span class="tag">Follow @rk.codex</span>
+                </div>
+              </div>
+
+              <div class="summary-panel">
+                <div class="summary-head">What To Open First</div>
+                <div class="summary-list">
+                  <div class="summary-item">
+                    <div class="summary-icon"><svg viewBox="0 0 24 24"><path d="M8 7h8M8 12h8M8 17h5"/><path d="M5 4h14v16H5z"/></svg></div>
+                    <div><div class="summary-title">Official base</div><div class="summary-copy">Start with `claude-code`, then `skills`, then `claude-code-action`.</div></div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="summary-icon"><svg viewBox="0 0 24 24"><path d="M4 7h6v4H4zM14 13h6v4h-6zM10 9h4M12 9v4"/></svg></div>
+                    <div><div class="summary-title">Power-user layer</div><div class="summary-copy">Add `claude-code-router` and `claude-code-mcp` when you need routing or agent bridges.</div></div>
+                  </div>
+                  <div class="summary-item">
+                    <div class="summary-icon"><svg viewBox="0 0 24 24"><path d="M6 6h12M6 12h12M6 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg></div>
+                    <div><div class="summary-title">Discovery repo</div><div class="summary-copy">Keep `awesome-claude-code` saved when you want the wider ecosystem map.</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span><span>follow for more</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:100%;"></div></div><span>10 / 10</span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="cr-nav">
+      <button class="cr-nav-btn" id="prev" onclick="navigate(-1)" aria-label="Previous slide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="cr-dots" id="dots"></div>
+      <button class="cr-nav-btn" id="next" onclick="navigate(1)" aria-label="Next slide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="export-root" id="exportRoot" aria-hidden="true"></div>
+  </div>
+
+  <script>
+    const total = 10;
+    let cur = 0;
+    let isExporting = false;
+
+    const exportStatus = document.getElementById('exportStatus');
+    const exportRoot = document.getElementById('exportRoot');
+    const saveAllBtn = document.getElementById('saveAllBtn');
+    const saveCurrentBtn = document.getElementById('saveCurrentBtn');
+    const phone = document.getElementById('phone');
+    const slides = [...document.querySelectorAll('.slide')];
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const dotsEl = document.getElementById('dots');
+    const themeToggle = document.getElementById('themeToggle');
+    const saveButtons = [...document.querySelectorAll('.slide-save')];
+
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'cr-dot' + (i === 0 ? ' on' : '');
+      dot.onclick = () => goTo(i);
+      dot.style.cursor = 'pointer';
+      dotsEl.appendChild(dot);
+    }
+
+    function setStatus(message) {
+      exportStatus.textContent = message || '';
+    }
+
+    function setNavState() {
+      prevBtn.disabled = cur === 0;
+      nextBtn.disabled = cur === total - 1;
+    }
+
+    function syncQueryParam() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('slide', String(cur + 1));
+      window.history.replaceState({}, '', url);
+    }
+
+    function goTo(n, options = {}) {
+      const { animate = true, updateQuery = true } = options;
+      if (n === cur && slides[cur].classList.contains('active')) {
+        if (updateQuery) syncQueryParam();
+        return;
+      }
+
+      if (animate) {
+        slides[cur].classList.remove('active');
+        slides[cur].classList.add('exit');
+        setTimeout(() => slides[cur].classList.remove('exit'), 380);
+      } else {
+        slides[cur].classList.remove('active', 'exit');
+      }
+
+      cur = n;
+      slides[cur].classList.add('active');
+      document.querySelectorAll('.cr-dot').forEach((dot, index) => {
+        dot.className = 'cr-dot' + (index === cur ? ' on' : '');
+      });
+      setNavState();
+      if (updateQuery) syncQueryParam();
+    }
+
+    function navigate(dir) {
+      const nextIndex = cur + dir;
+      if (nextIndex >= 0 && nextIndex < total) goTo(nextIndex);
+    }
+
+    function initializeFromQuery() {
+      const url = new URL(window.location.href);
+      const slideParam = Number(url.searchParams.get('slide'));
+      if (Number.isInteger(slideParam) && slideParam >= 1 && slideParam <= total) {
+        goTo(slideParam - 1, { animate: false, updateQuery: false });
+      } else {
+        syncQueryParam();
+      }
+
+      if (url.searchParams.get('export') === '1') {
+        document.body.classList.add('export-mode');
+      }
+    }
+
+    function downloadBlob(blob, fileName) {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = fileName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function buildExportFrame(slide) {
+      const frame = document.createElement('div');
+      frame.className = 'export-frame';
+
+      const shell = document.createElement('div');
+      shell.className = 'export-shell';
+
+      const stage = document.createElement('div');
+      stage.className = 'export-stage';
+
+      const phoneWrap = document.createElement('div');
+      phoneWrap.className = 'export-phone';
+
+      const clone = slide.cloneNode(true);
+      clone.classList.remove('exit');
+      clone.classList.add('active');
+      phoneWrap.appendChild(clone);
+      stage.appendChild(phoneWrap);
+      shell.appendChild(stage);
+      frame.appendChild(shell);
+
+      return frame;
+    }
+
+    function setExportBusy(isBusy) {
+      saveAllBtn.disabled = isBusy;
+      saveCurrentBtn.disabled = isBusy;
+      saveButtons.forEach((button) => button.disabled = isBusy);
+    }
+
+    async function renderSlideToBlob(slide) {
+      exportRoot.replaceChildren();
+      const frame = buildExportFrame(slide);
+      exportRoot.appendChild(frame);
+
+      await document.fonts.ready;
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      const canvas = await html2canvas(frame, {
+        backgroundColor: '#1a1a1a',
+        useCORS: true,
+        imageTimeout: 0,
+        scale: Number(getComputedStyle(document.documentElement).getPropertyValue('--ig-export-scale')) || 2,
+        width: frame.clientWidth,
+        height: frame.clientHeight,
+        logging: false
+      });
+
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('PNG export failed for slide ' + (cur + 1)));
+            return;
+          }
+          resolve(blob);
+        }, 'image/png');
+      });
+    }
+
+    async function saveCurrentSlide() {
+      if (isExporting) return;
+      if (!window.html2canvas) {
+        setStatus('Export library failed to load. Refresh once and try again.');
+        return;
+      }
+
+      isExporting = true;
+      setExportBusy(true);
+      setStatus(`Rendering slide ${cur + 1} of ${slides.length}...`);
+
+      try {
+        const blob = await renderSlideToBlob(slides[cur]);
+        downloadBlob(blob, `github-repos-for-claude-code-slide-${String(cur + 1).padStart(2, '0')}.png`);
+        setStatus('PNG downloaded.');
+      } catch (error) {
+        console.error(error);
+        setStatus(`Export failed: ${error && error.message ? error.message : 'Unknown error'}`);
+      } finally {
+        isExporting = false;
+        setExportBusy(false);
+        exportRoot.replaceChildren();
+      }
+    }
+
+    async function saveAllSlides() {
+      if (isExporting) return;
+      if (!window.html2canvas) {
+        setStatus('Export library failed to load. Refresh once and try again.');
+        return;
+      }
+
+      isExporting = true;
+      setExportBusy(true);
+      setStatus('Allow multiple downloads in Chrome if prompted.');
+
+      try {
+        for (let index = 0; index < slides.length; index += 1) {
+          setStatus(`Rendering slide ${index + 1} of ${slides.length}...`);
+          const blob = await renderSlideToBlob(slides[index]);
+          downloadBlob(blob, `github-repos-for-claude-code-slide-${String(index + 1).padStart(2, '0')}.png`);
+          await new Promise((resolve) => setTimeout(resolve, 180));
+        }
+        setStatus('All slides downloaded.');
+      } catch (error) {
+        console.error(error);
+        setStatus(`Export failed: ${error && error.message ? error.message : 'Unknown error'}`);
+      } finally {
+        isExporting = false;
+        setExportBusy(false);
+        exportRoot.replaceChildren();
+      }
+    }
+
+    function toggleTheme() {
+      if (document.body.classList.contains('light-mode')) {
+        document.body.classList.remove('light-mode');
+      } else {
+        document.body.classList.add('light-mode');
+      }
+    }
+
+    themeToggle.addEventListener('click', toggleTheme);
+    saveAllBtn.addEventListener('click', saveAllSlides);
+    saveCurrentBtn.addEventListener('click', saveCurrentSlide);
+    saveButtons.forEach((button) => button.addEventListener('click', saveCurrentSlide));
+
+    setNavState();
+    initializeFromQuery();
+
+    let startX = 0;
+    phone.addEventListener('touchstart', (event) => {
+      startX = event.touches[0].clientX;
+    }, { passive: true });
+
+    phone.addEventListener('touchend', (event) => {
+      const deltaX = event.changedTouches[0].clientX - startX;
+      if (Math.abs(deltaX) > 40) navigate(deltaX < 0 ? 1 : -1);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') navigate(1);
+      if (event.key === 'ArrowLeft') navigate(-1);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# generated workspaces
+.hyperframes-reel/
+
+# generated videos
+*_reel.mp4
+*_reel_test.mp4
+html-carousel/*_reel.mp4
+
+# macOS
+.DS_Store
+html-carousel/.DS_Store
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env
+.env
+.env.*
+!.env.example

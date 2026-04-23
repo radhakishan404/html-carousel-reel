@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ghgrab Terminal Tool Carousel</title>
+  <style>
+    :root {
+      --ig-width: 540px;
+      --ig-height: 675px;
+      --ig-export-scale: 2;
+      --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --font-display: "SF Pro Display", "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --font-mono: "SFMono-Regular", "SF Mono", "Aptos Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --bg: #f3efe6;
+      --ink: #13151b;
+      --muted: #5f6778;
+      --line: rgba(19, 21, 27, 0.1);
+      --shadow: 0 28px 72px rgba(42, 32, 16, 0.12);
+      --stage: linear-gradient(180deg, #f9f6ef 0%, #efe8da 100%);
+      --green: #1f9d6a;
+      --green-deep: #0f6a47;
+      --blue: #2f6fed;
+      --blue-deep: #1746a8;
+      --amber: #e58d1c;
+      --amber-deep: #9c5200;
+      --rose: #e36477;
+      --rose-deep: #9b2f42;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(229, 141, 28, 0.14), transparent 20%),
+        radial-gradient(circle at 88% 18%, rgba(47, 111, 237, 0.14), transparent 18%),
+        linear-gradient(180deg, #fbf8f2 0%, #efe7db 100%);
+      color: var(--ink);
+      font-family: var(--font-sans);
+    }
+
+    .cr-root {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 28px 16px 36px;
+      user-select: none;
+    }
+
+    .cr-toolbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .cr-meta-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(19, 21, 27, 0.66);
+    }
+
+    .cr-meta-title {
+      margin-top: 8px;
+      font-family: var(--font-display);
+      font-size: 34px;
+      line-height: 0.94;
+      letter-spacing: -0.05em;
+      max-width: 350px;
+    }
+
+    .cr-meta-sub {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: 360px;
+    }
+
+    .cr-export-btn {
+      appearance: none;
+      border: 1px solid rgba(19, 21, 27, 0.12);
+      background: #13151b;
+      color: #fff9f0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+      box-shadow: 0 14px 34px rgba(19, 21, 27, 0.14);
+      white-space: nowrap;
+    }
+
+    .cr-export-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 38px rgba(19, 21, 27, 0.18);
+    }
+
+    .cr-export-btn:disabled {
+      opacity: 0.7;
+      cursor: progress;
+    }
+
+    .cr-status {
+      min-height: 18px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: rgba(19, 21, 27, 0.62);
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: 592px;
+      margin: 0 auto;
+      padding: 14px;
+      border-radius: 36px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.58)),
+        repeating-linear-gradient(
+          90deg,
+          rgba(19,21,27,0.018) 0,
+          rgba(19,21,27,0.018) 1px,
+          transparent 1px,
+          transparent 24px
+        );
+      border: 1px solid rgba(255,255,255,0.75);
+      box-shadow: 0 28px 72px rgba(122, 98, 61, 0.16);
+    }
+
+    .stage::before,
+    .stage::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .stage::before {
+      width: 92px;
+      height: 92px;
+      border-radius: 26px;
+      background: rgba(47, 111, 237, 0.14);
+      left: -12px;
+      top: 34px;
+      transform: rotate(-11deg);
+    }
+
+    .stage::after {
+      width: 112px;
+      height: 112px;
+      border-radius: 999px;
+      border: 1px dashed rgba(19, 21, 27, 0.16);
+      right: -20px;
+      bottom: -26px;
+    }
+
+    .cr-phone {
+      width: 100%;
+      max-width: var(--ig-width);
+      aspect-ratio: 4 / 5;
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.72);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(19, 21, 27, 0.08);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 22px;
+      opacity: 0;
+      transform: translateX(36px);
+      transition: opacity 0.34s ease, transform 0.34s ease;
+      pointer-events: none;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      --accent: var(--green);
+      --accent-deep: var(--green-deep);
+      --soft: rgba(31, 157, 106, 0.12);
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .slide.exit {
+      opacity: 0;
+      transform: translateX(-36px);
+    }
+
+    .tone-green {
+      --accent: var(--green);
+      --accent-deep: var(--green-deep);
+      --soft: rgba(31, 157, 106, 0.12);
+      --bg: #eef6f2;
+    }
+
+    .tone-blue {
+      --accent: var(--blue);
+      --accent-deep: var(--blue-deep);
+      --soft: rgba(47, 111, 237, 0.11);
+      --bg: #edf3fe;
+    }
+
+    .tone-amber {
+      --accent: var(--amber);
+      --accent-deep: var(--amber-deep);
+      --soft: rgba(229, 141, 28, 0.12);
+      --bg: #f8f1e8;
+    }
+
+    .tone-rose {
+      --accent: var(--rose);
+      --accent-deep: var(--rose-deep);
+      --soft: rgba(227, 100, 119, 0.12);
+      --bg: #f8ecef;
+    }
+
+    .slide::before,
+    .slide::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .slide::before {
+      width: 190px;
+      height: 190px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.46);
+      border: 1px solid rgba(19, 21, 27, 0.06);
+      top: 58px;
+      right: -50px;
+      transform: rotate(18deg);
+    }
+
+    .slide::after {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: var(--soft);
+      right: 12px;
+      bottom: 20px;
+    }
+
+    .sl-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand,
+    .handle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(19, 21, 27, 0.08);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--soft);
+    }
+
+    .handle {
+      color: var(--accent-deep);
+      font-weight: 600;
+    }
+
+    .sl-main {
+      position: relative;
+      z-index: 1;
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .hero-title,
+    .section-title,
+    .card-title,
+    .big-number {
+      font-family: var(--font-display);
+      letter-spacing: -0.05em;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .hero-title {
+      font-size: 54px;
+      line-height: 0.9;
+      max-width: 420px;
+    }
+
+    .section-title {
+      font-size: 38px;
+      line-height: 0.95;
+      max-width: 430px;
+    }
+
+    .body-copy {
+      font-size: 15px;
+      line-height: 1.58;
+      color: rgba(19, 21, 27, 0.74);
+      max-width: 420px;
+    }
+
+    .body-copy strong {
+      color: var(--ink);
+    }
+
+    .accent-line {
+      width: 110px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .terminal-hero {
+      margin-top: 4px;
+      border-radius: 24px;
+      background: #11141a;
+      color: #f5f7fb;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 18px 42px rgba(17, 20, 26, 0.22);
+      max-width: 390px;
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(255,255,255,0.62);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .window-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .window-dots span:nth-child(1) { background: #ff7c61; }
+    .window-dots span:nth-child(2) { background: #ffca5f; }
+    .window-dots span:nth-child(3) { background: #31c574; }
+
+    .code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #dfe8ff;
+      white-space: pre-wrap;
+    }
+
+    .sticker {
+      width: fit-content;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(19,21,27,0.08);
+      font-size: 13px;
+      line-height: 1.45;
+      color: rgba(19,21,27,0.76);
+      transform: rotate(-1.4deg);
+      box-shadow: 0 12px 28px rgba(19,21,27,0.06);
+      max-width: 240px;
+    }
+
+    .stat-row,
+    .tool-grid,
+    .use-grid,
+    .install-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .stat-row,
+    .tool-grid,
+    .use-grid,
+    .install-grid.two {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .metric-card,
+    .tool-card,
+    .install-card,
+    .info-card,
+    .step-card,
+    .use-card {
+      position: relative;
+      z-index: 1;
+      border-radius: 20px;
+      padding: 14px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(19,21,27,0.08);
+      box-shadow: 0 12px 28px rgba(19,21,27,0.05);
+      overflow: hidden;
+    }
+
+    .metric-card::after,
+    .tool-card::after,
+    .install-card::after,
+    .use-card::after {
+      content: "";
+      position: absolute;
+      width: 74px;
+      height: 74px;
+      border-radius: 20px;
+      right: -14px;
+      bottom: -18px;
+      background: var(--soft);
+      transform: rotate(14deg);
+    }
+
+    .big-number {
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .mini-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 21px;
+      line-height: 1;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-copy,
+    .bullet-copy {
+      font-size: 12px;
+      line-height: 1.55;
+      color: rgba(19,21,27,0.72);
+      position: relative;
+      z-index: 1;
+    }
+
+    .install-card code,
+    .inline-code,
+    .flag-code {
+      font-family: var(--font-mono);
+    }
+
+    .install-card code {
+      display: block;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: #11141a;
+      color: #eff3fb;
+      font-size: 11px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-flow {
+      display: grid;
+      gap: 10px;
+    }
+
+    .step-card {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .step-num {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: var(--soft);
+      color: var(--accent-deep);
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .cmd-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .cmd-item {
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(19,21,27,0.08);
+      box-shadow: 0 12px 28px rgba(19,21,27,0.05);
+    }
+
+    .cmd-item code {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.55;
+      color: #14213a;
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .cmd-desc {
+      font-size: 12px;
+      line-height: 1.55;
+      color: rgba(19,21,27,0.72);
+    }
+
+    .flag-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flag-row {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(19,21,27,0.08);
+    }
+
+    .flag-code {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: #11141a;
+      color: #f7f8fb;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(19,21,27,0.08);
+    }
+
+    .feature-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--soft);
+      color: var(--accent-deep);
+      font-size: 17px;
+    }
+
+    .feature-title {
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.25;
+      margin-bottom: 4px;
+    }
+
+    .use-card {
+      min-height: 124px;
+    }
+
+    .cta-box {
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+      border-radius: 26px;
+      padding: 18px;
+      background: rgba(255,255,255,0.84);
+      border: 1px solid rgba(19,21,27,0.08);
+      box-shadow: 0 16px 36px rgba(19,21,27,0.06);
+    }
+
+    .cta-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 34px;
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      max-width: 360px;
+    }
+
+    .cta-copy {
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(19,21,27,0.74);
+      max-width: 350px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tag {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(19,21,27,0.06);
+      border: 1px solid rgba(19,21,27,0.08);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .final-layout {
+      display: grid;
+      grid-template-columns: 1.05fr 0.8fr;
+      gap: 16px;
+      align-items: end;
+      min-height: 100%;
+    }
+
+    .final-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .final-photo-wrap {
+      position: relative;
+      min-height: 420px;
+      border-radius: 30px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.28)),
+        linear-gradient(180deg, rgba(19,21,27,0.02), rgba(19,21,27,0.07));
+      border: 1px solid rgba(19,21,27,0.08);
+      box-shadow: 0 18px 40px rgba(19,21,27,0.08);
+    }
+
+    .final-photo-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.5);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .final-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: saturate(0.92) contrast(1.02);
+    }
+
+    .photo-badge {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid rgba(19,21,27,0.08);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(19,21,27,0.7);
+    }
+
+    .sl-footer {
+      margin-top: auto;
+      padding-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(19,21,27,0.58);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .footer-handle {
+      color: var(--accent-deep);
+      font-weight: 600;
+    }
+
+    .sl-page {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(19,21,27,0.62);
+    }
+
+    .sl-page-bar {
+      width: 78px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(19,21,27,0.12);
+      overflow: hidden;
+    }
+
+    .sl-page-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .cr-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .cr-nav-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(19,21,27,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 10px 24px rgba(19,21,27,0.08);
+    }
+
+    .cr-nav-btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.96);
+      transform: translateY(-1px);
+    }
+
+    .cr-nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .cr-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .cr-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(19,21,27,0.22);
+      transition: transform 0.22s ease, background 0.22s ease, width 0.22s ease;
+    }
+
+    .cr-dot.on {
+      width: 22px;
+      border-radius: 999px;
+      background: #13151b;
+    }
+
+    .export-root {
+      position: fixed;
+      inset: 0;
+      left: -99999px;
+      top: -99999px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .export-frame {
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      position: relative;
+      background: transparent;
+    }
+
+    .export-shell {
+      position: relative;
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(229, 141, 28, 0.14), transparent 20%),
+        radial-gradient(circle at 88% 18%, rgba(47, 111, 237, 0.14), transparent 18%),
+        linear-gradient(180deg, #fbf8f2 0%, #efe7db 100%);
+    }
+
+    .export-bloom-a,
+    .export-bloom-b,
+    .export-bloom-c {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .export-bloom-a {
+      width: 178px;
+      height: 178px;
+      border-radius: 42px;
+      background: rgba(47, 111, 237, 0.13);
+      left: 62px;
+      top: 238px;
+      transform: rotate(-11deg);
+    }
+
+    .export-bloom-b {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      border: 1px dashed rgba(19,21,27,0.16);
+      right: 46px;
+      bottom: 112px;
+    }
+
+    .export-bloom-c {
+      width: 136px;
+      height: 136px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.4);
+      left: 338px;
+      bottom: 48px;
+      filter: blur(2px);
+    }
+
+    .export-stage {
+      position: absolute;
+      left: 58px;
+      right: 58px;
+      top: 96px;
+      bottom: 82px;
+      padding: 26px;
+      border-radius: 64px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.58)),
+        repeating-linear-gradient(
+          90deg,
+          rgba(19,21,27,0.018) 0,
+          rgba(19,21,27,0.018) 1px,
+          transparent 1px,
+          transparent 42px
+        );
+      border: 1px solid rgba(255,255,255,0.76);
+      box-shadow: 0 28px 72px rgba(122, 98, 61, 0.16);
+    }
+
+    .export-stage::before {
+      content: "";
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 38px;
+      background: rgba(47, 111, 237, 0.12);
+      left: -18px;
+      top: 48px;
+      transform: rotate(-11deg);
+      pointer-events: none;
+    }
+
+    .export-stage::after {
+      content: "";
+      position: absolute;
+      width: 188px;
+      height: 188px;
+      border-radius: 999px;
+      border: 1px dashed rgba(19, 21, 27, 0.16);
+      right: -34px;
+      bottom: -40px;
+      pointer-events: none;
+    }
+
+    .export-phone {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 52px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.72);
+      box-shadow: 0 28px 72px rgba(42, 32, 16, 0.12);
+      border: 1px solid rgba(19, 21, 27, 0.08);
+    }
+
+    .export-phone .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+      border-radius: 52px;
+      padding: 48px;
+    }
+
+    .export-frame .sl-topbar {
+      min-height: 48px;
+    }
+
+    .export-frame .brand,
+    .export-frame .handle {
+      min-height: 48px;
+      padding: 11px 16px;
+      font-size: 14px;
+    }
+
+    .export-frame .brand-dot {
+      width: 12px;
+      height: 12px;
+    }
+
+    .export-frame .sl-main {
+      margin-top: 28px;
+      gap: 18px;
+    }
+
+    .export-frame .hero-title {
+      font-size: 108px;
+      max-width: 840px;
+    }
+
+    .export-frame .section-title {
+      font-size: 72px;
+      max-width: 820px;
+    }
+
+    .export-frame .body-copy {
+      font-size: 28px;
+      max-width: 760px;
+    }
+
+    .export-frame .accent-line {
+      width: 200px;
+      height: 14px;
+    }
+
+    .export-frame .terminal-hero {
+      max-width: 720px;
+      border-radius: 34px;
+      padding: 24px;
+    }
+
+    .export-frame .terminal-bar {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .export-frame .window-dots span {
+      width: 12px;
+      height: 12px;
+    }
+
+    .export-frame .code {
+      font-size: 20px;
+    }
+
+    .export-frame .sticker {
+      padding: 20px 22px;
+      border-radius: 26px;
+      font-size: 22px;
+      max-width: 420px;
+    }
+
+    .export-frame .stat-row,
+    .export-frame .tool-grid,
+    .export-frame .use-grid,
+    .export-frame .install-grid,
+    .export-frame .step-flow,
+    .export-frame .cmd-list,
+    .export-frame .flag-list,
+    .export-frame .feature-list,
+    .export-frame .tag-row {
+      gap: 16px;
+    }
+
+    .export-frame .metric-card,
+    .export-frame .tool-card,
+    .export-frame .install-card,
+    .export-frame .info-card,
+    .export-frame .step-card,
+    .export-frame .use-card,
+    .export-frame .cmd-item,
+    .export-frame .flag-row,
+    .export-frame .feature-row {
+      border-radius: 28px;
+      padding: 22px;
+    }
+
+    .export-frame .big-number {
+      font-size: 58px;
+    }
+
+    .export-frame .mini-label {
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .export-frame .card-title {
+      font-size: 34px;
+      margin-bottom: 12px;
+    }
+
+    .export-frame .card-copy,
+    .export-frame .bullet-copy,
+    .export-frame .cmd-desc {
+      font-size: 21px;
+    }
+
+    .export-frame .install-card code,
+    .export-frame .cmd-item code {
+      font-size: 18px;
+      border-radius: 20px;
+      padding: 16px 18px;
+      margin-top: 14px;
+    }
+
+    .export-frame .step-card {
+      grid-template-columns: 88px 1fr;
+      gap: 18px;
+    }
+
+    .export-frame .step-num {
+      width: 88px;
+      height: 88px;
+      border-radius: 26px;
+      font-size: 36px;
+    }
+
+    .export-frame .step-title {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .export-frame .flag-row {
+      grid-template-columns: 206px 1fr;
+      gap: 18px;
+    }
+
+    .export-frame .flag-code {
+      min-height: 54px;
+      border-radius: 18px;
+      font-size: 18px;
+      padding: 12px 16px;
+    }
+
+    .export-frame .feature-row {
+      grid-template-columns: 58px 1fr;
+      gap: 16px;
+    }
+
+    .export-frame .feature-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      font-size: 28px;
+    }
+
+    .export-frame .feature-title {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .export-frame .cta-box {
+      border-radius: 36px;
+      padding: 30px;
+    }
+
+    .export-frame .final-layout {
+      grid-template-columns: 1.08fr 0.8fr;
+      gap: 24px;
+    }
+
+    .export-frame .final-copy {
+      gap: 18px;
+    }
+
+    .export-frame .final-photo-wrap {
+      min-height: 690px;
+      border-radius: 42px;
+    }
+
+    .export-frame .final-photo-wrap::before {
+      inset: 18px;
+      border-radius: 32px;
+    }
+
+    .export-frame .photo-badge {
+      left: 18px;
+      bottom: 18px;
+      padding: 14px 18px;
+      font-size: 14px;
+    }
+
+    .export-frame .cta-title {
+      font-size: 68px;
+      max-width: 760px;
+    }
+
+    .export-frame .cta-copy {
+      font-size: 24px;
+      max-width: 700px;
+      margin-top: 14px;
+    }
+
+    .export-frame .tag {
+      font-size: 14px;
+      padding: 12px 16px;
+    }
+
+    .export-frame .sl-footer {
+      padding-top: 22px;
+    }
+
+    .export-frame .footer-left,
+    .export-frame .sl-page {
+      font-size: 14px;
+    }
+
+    .export-frame .sl-page-bar {
+      width: 154px;
+      height: 8px;
+    }
+
+    body.export-mode {
+      margin: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    body.export-mode .cr-toolbar,
+    body.export-mode .cr-status,
+    body.export-mode .stage,
+    body.export-mode .cr-nav {
+      display: none !important;
+    }
+
+    body.export-mode .cr-root {
+      width: 1080px;
+      height: 1350px;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    body.export-mode .export-root {
+      position: relative;
+      inset: auto;
+      left: 0;
+      top: 0;
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    @media (max-width: 640px) {
+      .cr-toolbar {
+        flex-direction: column;
+      }
+
+      .cr-export-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cr-root">
+    <div class="cr-toolbar">
+      <div>
+        <div class="cr-meta-label">Useful Tool Reel / ghgrab</div>
+        <div class="cr-meta-title">Stop cloning full repos for one file.</div>
+        <div class="cr-meta-sub">A more useful 8-slide carousel on <span class="inline-code">ghgrab</span>: what it does, how to install it, what commands matter, and where it actually saves time.</div>
+      </div>
+      <button class="cr-export-btn" id="downloadAllBtn" type="button" onclick="downloadAllSlides()">Download PNG Set</button>
+    </div>
+
+    <div class="cr-status" id="exportStatus" aria-live="polite"></div>
+
+    <div class="stage">
+      <div class="cr-phone" id="phone">
+        <section class="slide tone-green active" data-index="1">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Tool Breakdown</div>
+            <div class="handle">@rk.codex</div>
+          </div>
+
+          <div class="sl-main">
+            <h1 class="hero-title">Need 1 file from GitHub?</h1>
+            <div class="accent-line"></div>
+            <div class="body-copy"><strong>Don’t clone the whole repo.</strong> Use <span class="inline-code">ghgrab</span> to search, preview, and download only the files or folders you actually need.</div>
+
+            <div class="terminal-hero">
+              <div class="terminal-bar">
+                <div class="window-dots"><span></span><span></span><span></span></div>
+                <div>ghgrab demo</div>
+              </div>
+              <div class="code">$ ghgrab https://github.com/rust-lang/rust
+$ ghgrab ... --cwd --no-folder</div>
+            </div>
+
+            <div class="sticker">Useful for configs, examples, prompt files, docs, release binaries, and agent-friendly repo scraping.</div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span> <span>save-worthy tools</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:12.5%"></div></div><span>01 / 08</span></div>
+          </div>
+        </section>
+
+        <section class="slide tone-blue" data-index="2">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> What is ghgrab</div>
+            <div class="handle">@rk.codex</div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">A terminal tool for grabbing GitHub files without cloning.</h2>
+            <div class="body-copy">`ghgrab` lets you browse a repo, fuzzy-search files, preview content, and pull only the paths you want. It also supports release downloads and machine-friendly agent mode.</div>
+
+            <div class="stat-row">
+              <div class="metric-card">
+                <div class="mini-label">Checked on GitHub</div>
+                <div class="big-number">755</div>
+                <div class="card-copy">stars on <span class="inline-code">abhixdd/ghgrab</span></div>
+              </div>
+              <div class="metric-card">
+                <div class="mini-label">Latest release</div>
+                <div class="big-number">1.3.0</div>
+                <div class="card-copy">released on April 3, 2026</div>
+              </div>
+            </div>
+
+            <div class="tool-grid">
+              <div class="tool-card">
+                <div class="card-title">Search repos</div>
+                <div class="card-copy">Type a keyword and jump into repo search mode from home.</div>
+              </div>
+              <div class="tool-card">
+                <div class="card-title">Preview files</div>
+                <div class="card-copy">See code or text before downloading anything.</div>
+              </div>
+              <div class="tool-card">
+                <div class="card-title">Batch download</div>
+                <div class="card-copy">Select multiple files/folders at once.</div>
+              </div>
+              <div class="tool-card">
+                <div class="card-title">LFS + releases</div>
+                <div class="card-copy">Handles large files and release artifacts too.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span> <span>dev tool notes</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:25%"></div></div><span>02 / 08</span></div>
+          </div>
+        </section>
+
+        <section class="slide tone-amber" data-index="3">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Install Fast</div>
+            <div class="handle">@rk.codex</div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">Install it in the stack you already use.</h2>
+            <div class="body-copy">The repo ships across multiple ecosystems, so you don’t need a weird setup just to try it.</div>
+
+            <div class="install-grid two">
+              <div class="install-card">
+                <div class="mini-label">npm</div>
+                <div class="card-title">Node setup</div>
+                <code>npm install -g @ghgrab/ghgrab</code>
+              </div>
+              <div class="install-card">
+                <div class="mini-label">cargo</div>
+                <div class="card-title">Rust setup</div>
+                <code>cargo install ghgrab</code>
+              </div>
+              <div class="install-card">
+                <div class="mini-label">pipx</div>
+                <div class="card-title">Python setup</div>
+                <code>pipx install ghgrab</code>
+              </div>
+              <div class="install-card">
+                <div class="mini-label">nix</div>
+                <div class="card-title">Run directly</div>
+                <code>nix run github:abhixdd/ghgrab</code>
+              </div>
+            </div>
+
+            <div class="sticker">If you just want to test it once, start with <span class="inline-code">pipx</span> or <span class="inline-code">npm</span>.</div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span> <span>practical setup</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:37.5%"></div></div><span>03 / 08</span></div>
+          </div>
+        </section>
+
+        <section class="slide tone-green" data-index="4">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Basic Workflow</div>
+            <div class="handle">@rk.codex</div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">Use it in 3 easy steps.</h2>
+            <div class="step-flow">
+              <div class="step-card">
+                <div class="step-num">01</div>
+                <div>
+                  <div class="step-title">Open a repo or search one</div>
+                  <div class="bullet-copy">Run <span class="inline-code">ghgrab</span> or paste a GitHub URL directly.</div>
+                </div>
+              </div>
+
+              <div class="step-card">
+                <div class="step-num">02</div>
+                <div>
+                  <div class="step-title">Fuzzy-search and preview files</div>
+                  <div class="bullet-copy">Use the TUI to move through folders, search filenames, and preview code before downloading.</div>
+                </div>
+              </div>
+
+              <div class="step-card">
+                <div class="step-num">03</div>
+                <div>
+                  <div class="step-title">Download only what matters</div>
+                  <div class="bullet-copy">Grab a single file, a subtree, or selected folders. No clone-and-delete workflow.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="terminal-hero">
+              <div class="terminal-bar">
+                <div class="window-dots"><span></span><span></span><span></span></div>
+                <div>starter flow</div>
+              </div>
+              <div class="code">$ ghgrab
+$ ghgrab https://github.com/rust-lang/rust</div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span> <span>step-by-step</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:50%"></div></div><span>04 / 08</span></div>
+          </div>
+        </section>
+
+        <section class="slide tone-blue" data-index="5">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Commands That Matter</div>
+            <div class="handle">@rk.codex</div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">These are the commands most devs will actually use.</h2>
+
+            <div class="cmd-list">
+              <div class="cmd-item">
+                <code>ghgrab https://github.com/rust-lang/rust --cwd --no-folder</code>
+                <div class="cmd-desc">Download directly into the current directory without creating a repo folder.</div>
+              </div>
+
+              <div class="cmd-item">
+                <code>ghgrab rel sharkdp/bat --extract</code>
+                <div class="cmd-desc">Pull a release asset instead of browsing the repo manually.</div>
+              </div>
+
+              <div class="cmd-item">
+                <code>ghgrab agent tree https://github.com/rust-lang/rust</code>
+                <div class="cmd-desc">Get a stable JSON tree for scripts, agents, CI, or automation tooling.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span> <span>copy these</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:62.5%"></div></div><span>05 / 08</span></div>
+          </div>
+        </section>
+
+        <section class="slide tone-rose" data-index="6">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Useful Flags + Features</div>
+            <div class="handle">@rk.codex</div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">The hidden value is in the small flags.</h2>
+
+            <div class="flag-list">
+              <div class="flag-row">
+                <div class="flag-code">--cwd</div>
+                <div class="bullet-copy">Force downloads into the current working directory.</div>
+              </div>
+              <div class="flag-row">
+                <div class="flag-code">--no-folder</div>
+                <div class="bullet-copy">Skip the extra repo folder when you only need one file fast.</div>
+              </div>
+              <div class="flag-row">
+                <div class="flag-code">--token</div>
+                <div class="bullet-copy">Use an explicit GitHub token for that run without saving it locally.</div>
+              </div>
+            </div>
+
+            <div class="feature-list">
+              <div class="feature-row">
+                <div class="feature-icon">⌕</div>
+                <div>
+                  <div class="feature-title">Repo discovery mode</div>
+                  <div class="bullet-copy">Type a repo keyword from home and browse GitHub repos instantly.</div>
+                </div>
+              </div>
+              <div class="feature-row">
+                <div class="feature-icon">⚙</div>
+                <div>
+                  <div class="feature-title">Agent mode</div>
+                  <div class="bullet-copy">`agent tree` and `agent download` return machine-friendly output for automation.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span> <span>small flags, big win</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:75%"></div></div><span>06 / 08</span></div>
+          </div>
+        </section>
+
+        <section class="slide tone-amber" data-index="7">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Best Use Cases</div>
+            <div class="handle">@rk.codex</div>
+          </div>
+
+          <div class="sl-main">
+            <h2 class="section-title">Where ghgrab is actually useful in real work</h2>
+
+            <div class="use-grid">
+              <div class="use-card">
+                <div class="card-title">Steal just the config</div>
+                <div class="card-copy">Grab ESLint, Tailwind, CI, Docker, or deployment configs from a repo without the rest.</div>
+              </div>
+              <div class="use-card">
+                <div class="card-title">Copy examples fast</div>
+                <div class="card-copy">Pull a working example folder from open source and test it locally in minutes.</div>
+              </div>
+              <div class="use-card">
+                <div class="card-title">Prompt + docs extraction</div>
+                <div class="card-copy">Useful when you only need README, prompts, docs, or templates for research.</div>
+              </div>
+              <div class="use-card">
+                <div class="card-title">Agent / CI tooling</div>
+                <div class="card-copy">Use `agent tree` and `agent download` in scripts where stable JSON matters.</div>
+              </div>
+            </div>
+
+            <div class="sticker">If you work with GitHub every day, this is the kind of tiny tool that quietly saves time every week.</div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span> <span>high utility</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:87.5%"></div></div><span>07 / 08</span></div>
+          </div>
+        </section>
+
+        <section class="slide tone-green" data-index="8">
+          <div class="sl-topbar">
+            <div class="brand"><span class="brand-dot"></span> Save This Tool</div>
+            <div class="handle">@rk.codex</div>
+          </div>
+
+          <div class="sl-main">
+            <div class="final-layout">
+              <div class="final-copy">
+                <div class="sticker">One small terminal tool. Less repo clutter. Less wasted setup time.</div>
+                <div class="cta-box">
+                  <h2 class="cta-title">Save this if you use GitHub daily.</h2>
+                  <div class="cta-copy">`ghgrab` is one of those tools that looks small, but becomes part of your workflow once you use it twice.</div>
+                  <div class="tag-row">
+                    <div class="tag">No full clone</div>
+                    <div class="tag">Preview files</div>
+                    <div class="tag">Release download</div>
+                    <div class="tag">Agent mode</div>
+                    <div class="tag">@rk.codex</div>
+                  </div>
+                </div>
+                <div class="sticker">Follow for more tools that save real developer time, not just flashy demos.</div>
+              </div>
+
+              <div class="final-photo-wrap">
+                <img class="final-photo" src="assets/leaning-smile-black-suit.png" alt="Radhakishan portrait">
+                <div class="photo-badge">@rk.codex / dev tools</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="footer-left"><span class="footer-handle">@rk.codex</span> <span>follow for useful dev tools</span></div>
+            <div class="sl-page"><div class="sl-page-bar"><div class="sl-page-fill" style="width:100%"></div></div><span>08 / 08</span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="cr-nav">
+      <button class="cr-nav-btn" id="prev" onclick="navigate(-1)" aria-label="Previous slide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#13151b" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="cr-dots" id="dots"></div>
+      <button class="cr-nav-btn" id="next" onclick="navigate(1)" aria-label="Next slide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#13151b" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="export-root" id="exportRoot" aria-hidden="true"></div>
+  </div>
+
+  <script src="./assets/portrait-inline.js"></script>
+  <script src="./vendor/html2canvas.min.js"></script>
+  <script src="./vendor/jszip.min.js"></script>
+  <script>
+    const total = 8;
+    let cur = 0;
+    let isExporting = false;
+
+    const exportStatus = document.getElementById('exportStatus');
+    const exportRoot = document.getElementById('exportRoot');
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    const phone = document.getElementById('phone');
+    const slides = [...document.querySelectorAll('.slide')];
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const dotsEl = document.getElementById('dots');
+
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'cr-dot' + (i === 0 ? ' on' : '');
+      dot.onclick = () => goTo(i);
+      dot.style.cursor = 'pointer';
+      dotsEl.appendChild(dot);
+    }
+
+    function setNavState() {
+      prevBtn.disabled = cur === 0;
+      nextBtn.disabled = cur === total - 1;
+    }
+
+    function syncQueryParam() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('slide', String(cur + 1));
+      window.history.replaceState({}, '', url);
+    }
+
+    function goTo(n, options = {}) {
+      const { animate = true, updateQuery = true } = options;
+      if (n === cur && slides[cur].classList.contains('active')) {
+        if (updateQuery) syncQueryParam();
+        return;
+      }
+
+      if (animate) {
+        slides[cur].classList.remove('active');
+        slides[cur].classList.add('exit');
+        setTimeout(() => slides[cur].classList.remove('exit'), 380);
+      } else {
+        slides[cur].classList.remove('active', 'exit');
+      }
+
+      cur = n;
+      slides[cur].classList.add('active');
+      document.querySelectorAll('.cr-dot').forEach((dot, index) => {
+        dot.className = 'cr-dot' + (index === cur ? ' on' : '');
+      });
+      setNavState();
+      if (updateQuery) syncQueryParam();
+    }
+
+    function navigate(dir) {
+      const nextIndex = cur + dir;
+      if (nextIndex >= 0 && nextIndex < total) goTo(nextIndex);
+    }
+
+    function setStatus(message) {
+      exportStatus.textContent = message || '';
+    }
+
+    function initializeFromQuery() {
+      const url = new URL(window.location.href);
+      const slideParam = Number(url.searchParams.get('slide'));
+      if (Number.isInteger(slideParam) && slideParam >= 1 && slideParam <= total) {
+        goTo(slideParam - 1, { animate: false, updateQuery: false });
+      } else {
+        syncQueryParam();
+      }
+
+      if (url.searchParams.get('export') === '1') {
+        enableExportMode();
+      }
+    }
+
+    function downloadBlob(blob, fileName) {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = fileName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function buildExportFrame(slide) {
+      const frame = document.createElement('div');
+      frame.className = 'export-frame';
+
+      const shell = document.createElement('div');
+      shell.className = 'export-shell';
+
+      const bloomA = document.createElement('div');
+      bloomA.className = 'export-bloom-a';
+      const bloomB = document.createElement('div');
+      bloomB.className = 'export-bloom-b';
+      const bloomC = document.createElement('div');
+      bloomC.className = 'export-bloom-c';
+
+      const stage = document.createElement('div');
+      stage.className = 'export-stage';
+
+      const phone = document.createElement('div');
+      phone.className = 'export-phone';
+
+      const clone = slide.cloneNode(true);
+      clone.classList.remove('exit');
+      clone.classList.add('active');
+
+      const exportPortrait = clone.querySelector('.final-photo');
+      if (exportPortrait && window.__RK_INLINE_PORTRAIT__) {
+        exportPortrait.src = window.__RK_INLINE_PORTRAIT__;
+      }
+
+      phone.appendChild(clone);
+      stage.appendChild(phone);
+      shell.appendChild(bloomA);
+      shell.appendChild(bloomB);
+      shell.appendChild(bloomC);
+      shell.appendChild(stage);
+      frame.appendChild(shell);
+
+      return frame;
+    }
+
+    function enableExportMode() {
+      document.body.classList.add('export-mode');
+      exportRoot.replaceChildren();
+      exportRoot.appendChild(buildExportFrame(slides[cur]));
+    }
+
+    async function waitForFrameAssets(frame) {
+      const images = [...frame.querySelectorAll('img')];
+      await Promise.all(images.map(async (img) => {
+        if (!img.getAttribute('src')) return;
+
+        if (!img.complete || img.naturalWidth === 0) {
+          await new Promise((resolve) => {
+            const done = () => {
+              img.removeEventListener('load', done);
+              img.removeEventListener('error', done);
+              resolve();
+            };
+
+            img.addEventListener('load', done, { once: true });
+            img.addEventListener('error', done, { once: true });
+          });
+        }
+
+        if (img.decode) {
+          try {
+            await img.decode();
+          } catch (error) {
+            console.warn('Image decode skipped:', error);
+          }
+        }
+      }));
+    }
+
+    async function renderSlideToBlob(slide, index) {
+      exportRoot.replaceChildren();
+      const frame = buildExportFrame(slide);
+      exportRoot.appendChild(frame);
+
+      await document.fonts.ready;
+      await waitForFrameAssets(frame);
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+      const canvas = await html2canvas(frame, {
+        backgroundColor: '#f3efe6',
+        useCORS: false,
+        imageTimeout: 0,
+        scale: Number(getComputedStyle(document.documentElement).getPropertyValue('--ig-export-scale')) || 2,
+        width: frame.clientWidth,
+        height: frame.clientHeight,
+        logging: false
+      });
+
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('PNG export failed for slide ' + (index + 1)));
+            return;
+          }
+          resolve(blob);
+        }, 'image/png');
+      });
+    }
+
+    async function downloadAllSlides() {
+      if (isExporting) return;
+      if (!window.html2canvas || !window.JSZip) {
+        setStatus('Export libraries failed to load. Refresh once and try again.');
+        return;
+      }
+
+      isExporting = true;
+      downloadAllBtn.disabled = true;
+      setStatus('Preparing 8 carousel slides...');
+
+      try {
+        const zip = new JSZip();
+
+        for (let i = 0; i < slides.length; i++) {
+          setStatus(`Rendering slide ${i + 1} of ${slides.length}...`);
+          const blob = await renderSlideToBlob(slides[i], i);
+          zip.file(`ghgrab-tool-carousel-slide-${String(i + 1).padStart(2, '0')}.png`, blob);
+        }
+
+        exportRoot.replaceChildren();
+        setStatus('Compressing PNG set...');
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        downloadBlob(zipBlob, 'ghgrab-tool-carousel.zip');
+        setStatus('PNG set downloaded.');
+      } catch (error) {
+        console.error(error);
+        setStatus(`Export failed: ${error && error.message ? error.message : 'Unknown error'}`);
+      } finally {
+        isExporting = false;
+        downloadAllBtn.disabled = false;
+        exportRoot.replaceChildren();
+      }
+    }
+
+    setNavState();
+    initializeFromQuery();
+
+    let startX = 0;
+    phone.addEventListener('touchstart', (event) => {
+      startX = event.touches[0].clientX;
+    }, { passive: true });
+
+    phone.addEventListener('touchend', (event) => {
+      const deltaX = event.changedTouches[0].clientX - startX;
+      if (Math.abs(deltaX) > 40) navigate(deltaX < 0 ? 1 : -1);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') navigate(1);
+      if (event.key === 'ArrowLeft') navigate(-1);
+    });
+  </script>
+</body>
+</html>

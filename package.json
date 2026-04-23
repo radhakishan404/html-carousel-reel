@@ -1,0 +1,29 @@
+{
+  "name": "html-carousel-reel",
+  "version": "1.0.0",
+  "description": "Open-source local HTML carousel to animated reel generator built on HyperFrames",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "carousel-reel": "./scripts/render-carousel-reel.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "render:reel": "node ./scripts/render-carousel-reel.mjs",
+    "render:all": "node ./scripts/render-all.mjs",
+    "check": "node ./scripts/render-carousel-reel.mjs --help"
+  },
+  "keywords": [
+    "hyperframes",
+    "html-to-video",
+    "reels",
+    "carousel",
+    "video-generator",
+    "gsap"
+  ],
+  "dependencies": {
+    "cheerio": "^1.1.2"
+  }
+}

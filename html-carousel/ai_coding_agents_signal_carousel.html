@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Coding Agents Signal Carousel</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
+
+    :root {
+      --ig-width: 540px;
+      --ig-height: 675px;
+      --ig-export-scale: 2;
+      --paper: #f6f0e6;
+      --ink: #1f2430;
+      --muted: #667085;
+      --line: rgba(31, 36, 48, 0.1);
+      --shadow: 0 26px 70px rgba(40, 34, 26, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(240, 180, 90, 0.15), transparent 24%),
+        radial-gradient(circle at right 15% bottom 10%, rgba(52, 211, 153, 0.14), transparent 22%),
+        linear-gradient(180deg, #fbf8f1 0%, #efe8dc 100%);
+      color: var(--ink);
+      font-family: 'Manrope', sans-serif;
+    }
+
+    .cr-root {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 28px 16px 36px;
+      user-select: none;
+    }
+
+    .cr-toolbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .cr-meta-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(31, 36, 48, 0.68);
+    }
+
+    .cr-meta-title {
+      margin-top: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      max-width: 320px;
+    }
+
+    .cr-meta-sub {
+      margin-top: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+      max-width: 340px;
+    }
+
+    .cr-export-btn {
+      appearance: none;
+      border: 1px solid rgba(31, 36, 48, 0.12);
+      background: #1f2430;
+      color: #fff7eb;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+      box-shadow: 0 12px 30px rgba(31, 36, 48, 0.16);
+      white-space: nowrap;
+    }
+
+    .cr-export-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 34px rgba(31, 36, 48, 0.2);
+    }
+
+    .cr-export-btn:disabled {
+      opacity: 0.7;
+      cursor: progress;
+    }
+
+    .cr-status {
+      min-height: 18px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: rgba(31, 36, 48, 0.62);
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: 592px;
+      margin: 0 auto;
+      padding: 14px;
+      border-radius: 34px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.62)),
+        repeating-linear-gradient(
+          0deg,
+          rgba(31,36,48,0.02) 0,
+          rgba(31,36,48,0.02) 1px,
+          transparent 1px,
+          transparent 20px
+        );
+      border: 1px solid rgba(255,255,255,0.68);
+      box-shadow: 0 26px 70px rgba(126, 101, 67, 0.16);
+    }
+
+    .stage::before,
+    .stage::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .stage::before {
+      width: 88px;
+      height: 88px;
+      background: rgba(255, 146, 75, 0.2);
+      top: -18px;
+      left: -10px;
+      filter: blur(2px);
+    }
+
+    .stage::after {
+      width: 120px;
+      height: 120px;
+      border: 1px dashed rgba(64, 71, 91, 0.16);
+      right: -22px;
+      bottom: -24px;
+    }
+
+    .cr-phone {
+      width: 100%;
+      max-width: var(--ig-width);
+      aspect-ratio: 4 / 5;
+      border-radius: 26px;
+      overflow: hidden;
+      position: relative;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.72);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(31, 36, 48, 0.08);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      opacity: 0;
+      transform: translateX(36px) rotate(0.4deg);
+      transition: opacity 0.36s ease, transform 0.36s ease;
+      pointer-events: none;
+      overflow: hidden;
+      color: var(--ink);
+      background: var(--paper);
+      --accent: #ff8747;
+      --accent-ink: #9a3f12;
+      --surface: rgba(255,255,255,0.74);
+      --surface-strong: rgba(255,255,255,0.86);
+      --shape: rgba(31, 36, 48, 0.06);
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0) rotate(0deg);
+      pointer-events: auto;
+    }
+
+    .slide.exit {
+      opacity: 0;
+      transform: translateX(-36px) rotate(-0.4deg);
+    }
+
+    .slide::before,
+    .slide::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .slide::before {
+      width: 210px;
+      height: 210px;
+      border-radius: 28px;
+      background: rgba(255,255,255,0.5);
+      border: 1px solid rgba(31, 36, 48, 0.06);
+      right: -54px;
+      top: 44px;
+      transform: rotate(18deg);
+    }
+
+    .slide::after {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background: var(--shape);
+      right: 20px;
+      bottom: 34px;
+    }
+
+    .tone-sand {
+      --paper: #f6efe3;
+      --accent: #ff8747;
+      --accent-ink: #9a3f12;
+      --shape: rgba(255, 135, 71, 0.12);
+    }
+
+    .tone-mint {
+      --paper: #e9f4ef;
+      --accent: #0fa37f;
+      --accent-ink: #0b6e56;
+      --shape: rgba(15, 163, 127, 0.12);
+    }
+
+    .tone-sky {
+      --paper: #eaf0fb;
+      --accent: #4b77ff;
+      --accent-ink: #2446a8;
+      --shape: rgba(75, 119, 255, 0.11);
+    }
+
+    .tone-peach {
+      --paper: #f8e6dd;
+      --accent: #e45a42;
+      --accent-ink: #923424;
+      --shape: rgba(228, 90, 66, 0.12);
+    }
+
+    .sl-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sl-kicker,
+    .sl-date {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(31, 36, 48, 0.08);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .sl-kicker strong {
+      color: var(--accent-ink);
+      font-weight: 600;
+    }
+
+    .sl-top {
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sl-hero {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 54px;
+      line-height: 0.92;
+      letter-spacing: -0.06em;
+      max-width: 440px;
+      margin: 0;
+    }
+
+    .sl-accent-line {
+      width: 108px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent);
+      margin: 18px 0 16px;
+    }
+
+    .sl-copy {
+      font-size: 16px;
+      line-height: 1.55;
+      color: rgba(31, 36, 48, 0.72);
+      max-width: 430px;
+    }
+
+    .sl-copy strong {
+      color: var(--ink);
+    }
+
+    .sl-signal {
+      margin-top: 18px;
+      width: fit-content;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: var(--surface-strong);
+      border: 1px solid rgba(31, 36, 48, 0.08);
+      box-shadow: 0 14px 30px rgba(31, 36, 48, 0.06);
+      font-size: 13px;
+      line-height: 1.45;
+      max-width: 260px;
+      transform: rotate(-1.2deg);
+    }
+
+    .sl-icon {
+      position: absolute;
+      right: 28px;
+      top: 96px;
+      width: 110px;
+      height: 110px;
+      color: var(--accent-ink);
+      opacity: 0.9;
+      z-index: 1;
+    }
+
+    .sl-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .sl-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 20px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .metric-card,
+    .note-card,
+    .map-card,
+    .persona-card {
+      background: var(--surface);
+      border: 1px solid rgba(31, 36, 48, 0.08);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 10px 26px rgba(31, 36, 48, 0.05);
+    }
+
+    .metric-card {
+      min-height: 132px;
+    }
+
+    .metric-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .metric-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .metric-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-ink);
+    }
+
+    .metric-stars {
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-top: 12px;
+    }
+
+    .metric-label,
+    .metric-desc,
+    .note-desc,
+    .map-desc,
+    .persona-desc {
+      font-size: 12px;
+      line-height: 1.55;
+      color: rgba(31, 36, 48, 0.7);
+    }
+
+    .metric-desc {
+      margin-top: 8px;
+    }
+
+    .hn-card {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 14px;
+      align-items: start;
+      background: var(--surface-strong);
+      border: 1px solid rgba(31, 36, 48, 0.08);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 12px 28px rgba(31, 36, 48, 0.05);
+    }
+
+    .hn-chip {
+      border-radius: 18px;
+      background: var(--accent);
+      color: white;
+      padding: 10px 10px 8px;
+      text-align: center;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08);
+    }
+
+    .hn-chip strong {
+      display: block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .hn-chip span {
+      display: block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.9;
+      margin-top: 6px;
+    }
+
+    .hn-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      margin: 0 0 8px;
+      max-width: 300px;
+    }
+
+    .hn-meta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(31, 36, 48, 0.54);
+      margin-bottom: 6px;
+    }
+
+    .map-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .map-card {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 14px;
+      align-items: start;
+      min-height: 102px;
+    }
+
+    .map-num {
+      display: grid;
+      place-items: center;
+      width: 74px;
+      height: 74px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.74);
+      border: 1px solid rgba(31,36,48,0.08);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--accent-ink);
+    }
+
+    .map-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 21px;
+      line-height: 1.04;
+      letter-spacing: -0.04em;
+      margin-bottom: 6px;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 10px;
+    }
+
+    .check-item {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid rgba(31, 36, 48, 0.08);
+    }
+
+    .check-icon {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: rgba(31,36,48,0.08);
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .check-title {
+      font-weight: 800;
+      font-size: 14px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .check-desc {
+      font-size: 12px;
+      line-height: 1.5;
+      color: rgba(31,36,48,0.7);
+    }
+
+    .persona-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .persona-card {
+      min-height: 140px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .persona-card::after {
+      content: "";
+      position: absolute;
+      right: -18px;
+      bottom: -20px;
+      width: 78px;
+      height: 78px;
+      border-radius: 22px;
+      background: var(--shape);
+      transform: rotate(14deg);
+    }
+
+    .persona-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-panel {
+      margin-top: auto;
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(31,36,48,0.08);
+      box-shadow: 0 14px 34px rgba(31,36,48,0.06);
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 34px;
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      margin: 0;
+      max-width: 360px;
+    }
+
+    .cta-text {
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(31,36,48,0.72);
+      max-width: 340px;
+    }
+
+    .watch-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .watch-chip {
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(31,36,48,0.06);
+      border: 1px solid rgba(31,36,48,0.08);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .sl-footer {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+      padding-top: 16px;
+    }
+
+    .sl-source {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      line-height: 1.45;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(31,36,48,0.52);
+      max-width: 240px;
+    }
+
+    .sl-page {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: rgba(31,36,48,0.62);
+    }
+
+    .sl-page-bar {
+      width: 78px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(31,36,48,0.1);
+      overflow: hidden;
+    }
+
+    .sl-page-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .cr-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .cr-nav-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(31,36,48,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 10px 24px rgba(31,36,48,0.08);
+    }
+
+    .cr-nav-btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.95);
+      transform: translateY(-1px);
+    }
+
+    .cr-nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .cr-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .cr-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(31,36,48,0.2);
+      transition: transform 0.22s ease, background 0.22s ease, width 0.22s ease;
+    }
+
+    .cr-dot.on {
+      width: 22px;
+      border-radius: 999px;
+      background: #1f2430;
+      transform: none;
+    }
+
+    .export-root {
+      position: fixed;
+      inset: 0;
+      left: -99999px;
+      top: -99999px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .export-frame {
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      position: relative;
+      background: transparent;
+    }
+
+    .export-frame .slide {
+      position: relative;
+      inset: auto;
+      width: 1080px;
+      height: 1350px;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+      border-radius: 0;
+      padding: 48px;
+    }
+
+    .export-frame .sl-meta {
+      min-height: 44px;
+    }
+
+    .export-frame .sl-kicker,
+    .export-frame .sl-date {
+      min-height: 44px;
+      padding: 11px 16px;
+      font-size: 14px;
+    }
+
+    .export-frame .sl-top {
+      margin-top: 26px;
+    }
+
+    .export-frame .sl-hero {
+      font-size: 110px;
+      max-width: 860px;
+    }
+
+    .export-frame .sl-accent-line {
+      width: 210px;
+      height: 14px;
+      margin: 28px 0 24px;
+    }
+
+    .export-frame .sl-copy {
+      font-size: 31px;
+      max-width: 780px;
+    }
+
+    .export-frame .sl-signal {
+      margin-top: 26px;
+      padding: 22px 24px;
+      border-radius: 26px;
+      font-size: 24px;
+      max-width: 420px;
+    }
+
+    .export-frame .sl-icon {
+      width: 220px;
+      height: 220px;
+      right: 56px;
+      top: 144px;
+    }
+
+    .export-frame .sl-body {
+      margin-top: 30px;
+      gap: 18px;
+    }
+
+    .export-frame .stack,
+    .export-frame .map-grid,
+    .export-frame .checklist {
+      gap: 16px;
+    }
+
+    .export-frame .row-two,
+    .export-frame .persona-grid {
+      gap: 16px;
+    }
+
+    .export-frame .metric-card,
+    .export-frame .note-card,
+    .export-frame .map-card,
+    .export-frame .persona-card,
+    .export-frame .check-item,
+    .export-frame .hn-card {
+      padding: 22px;
+      border-radius: 28px;
+    }
+
+    .export-frame .metric-card {
+      min-height: 252px;
+    }
+
+    .export-frame .metric-name {
+      font-size: 36px;
+    }
+
+    .export-frame .metric-tag {
+      font-size: 13px;
+    }
+
+    .export-frame .metric-stars {
+      font-size: 54px;
+      margin-top: 20px;
+    }
+
+    .export-frame .metric-label,
+    .export-frame .metric-desc,
+    .export-frame .note-desc,
+    .export-frame .map-desc,
+    .export-frame .persona-desc {
+      font-size: 22px;
+    }
+
+    .export-frame .hn-card {
+      grid-template-columns: 144px 1fr;
+      gap: 22px;
+    }
+
+    .export-frame .hn-chip {
+      border-radius: 28px;
+      padding: 18px 16px 14px;
+    }
+
+    .export-frame .hn-chip strong {
+      font-size: 48px;
+    }
+
+    .export-frame .hn-chip span,
+    .export-frame .hn-meta {
+      font-size: 15px;
+    }
+
+    .export-frame .hn-title {
+      font-size: 44px;
+      max-width: 560px;
+      margin-bottom: 14px;
+    }
+
+    .export-frame .map-card {
+      grid-template-columns: 132px 1fr;
+      gap: 22px;
+      min-height: 184px;
+    }
+
+    .export-frame .map-num {
+      width: 132px;
+      height: 132px;
+      border-radius: 34px;
+      font-size: 52px;
+    }
+
+    .export-frame .map-title {
+      font-size: 44px;
+      margin-bottom: 10px;
+    }
+
+    .export-frame .check-item {
+      grid-template-columns: 52px 1fr;
+      gap: 16px;
+    }
+
+    .export-frame .check-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      font-size: 28px;
+    }
+
+    .export-frame .check-title {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .export-frame .check-desc {
+      font-size: 21px;
+    }
+
+    .export-frame .persona-card {
+      min-height: 244px;
+    }
+
+    .export-frame .persona-title {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .export-frame .cta-panel {
+      padding: 30px;
+      border-radius: 34px;
+    }
+
+    .export-frame .cta-title {
+      font-size: 68px;
+      max-width: 760px;
+    }
+
+    .export-frame .cta-text {
+      margin-top: 16px;
+      font-size: 24px;
+      max-width: 680px;
+    }
+
+    .export-frame .watch-row {
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .export-frame .watch-chip {
+      padding: 12px 16px;
+      font-size: 14px;
+    }
+
+    .export-frame .sl-footer {
+      padding-top: 24px;
+    }
+
+    .export-frame .sl-source,
+    .export-frame .sl-page {
+      font-size: 14px;
+    }
+
+    .export-frame .sl-page-bar {
+      width: 154px;
+      height: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .cr-toolbar {
+        flex-direction: column;
+      }
+
+      .cr-export-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cr-root">
+    <div class="cr-toolbar">
+      <div>
+        <div class="cr-meta-label">Signal Deck / 11 Apr 2026</div>
+        <div class="cr-meta-title">AI coding agents are the real dev signal today.</div>
+        <div class="cr-meta-sub">Fresh 8-slide carousel based on the current Hacker News front page and GitHub Trending repositories. Lighter visual system, new content, new layout, new export set.</div>
+      </div>
+      <button class="cr-export-btn" id="downloadAllBtn" type="button" onclick="downloadAllSlides()">Download PNG Set</button>
+    </div>
+
+    <div class="cr-status" id="exportStatus" aria-live="polite"></div>
+
+    <div class="stage">
+      <div class="cr-phone" id="phone">
+        <section class="slide tone-sand active" data-index="1">
+          <div class="sl-meta">
+            <div class="sl-kicker"><strong>Signal</strong> daily dev brief</div>
+            <div class="sl-date">11 Apr 2026</div>
+          </div>
+
+          <div class="sl-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <path d="M10 49h44"></path>
+              <path d="M16 42V28"></path>
+              <path d="M26 42V18"></path>
+              <path d="M36 42V24"></path>
+              <path d="M46 42V12"></path>
+              <path d="M14 16c7 0 10 10 17 10 7 0 8-10 19-10"></path>
+            </svg>
+          </div>
+
+          <div class="sl-top">
+            <h1 class="sl-hero">AI coding agents are not a side project anymore.</h1>
+            <div class="sl-accent-line"></div>
+            <div class="sl-copy"><strong>GitHub Trending</strong> and <strong>Hacker News</strong> are both pointing at the same shift: developers are moving from “ask AI” to “assign work and review the result”.</div>
+            <div class="sl-signal">Today’s signal: agents are turning into workflow infrastructure, not just chat UX.</div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="sl-source">Sources / GitHub Trending + HN front page / snapshot on 11 Apr 2026</div>
+            <div class="sl-page">
+              <div class="sl-page-bar"><div class="sl-page-fill" style="width:12.5%"></div></div>
+              <span>01 / 08</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide tone-mint" data-index="2">
+          <div class="sl-meta">
+            <div class="sl-kicker"><strong>GitHub</strong> trending today</div>
+            <div class="sl-date">Real repo data</div>
+          </div>
+
+          <div class="sl-top">
+            <h2 class="sl-hero" style="font-size:42px; max-width:430px;">The hottest repos are agent tools, harnesses, and workflow building blocks.</h2>
+            <div class="sl-accent-line"></div>
+          </div>
+
+          <div class="sl-body">
+            <div class="row-two">
+              <div class="metric-card">
+                <div class="metric-top">
+                  <div class="metric-name">hermes-agent</div>
+                  <div class="metric-tag">Python</div>
+                </div>
+                <div class="metric-stars">7,671</div>
+                <div class="metric-label">stars today</div>
+                <div class="metric-desc">“The agent that grows with you.” Big signal for personal agent stacks.</div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-top">
+                  <div class="metric-name">multica</div>
+                  <div class="metric-tag">TypeScript</div>
+                </div>
+                <div class="metric-stars">1,506</div>
+                <div class="metric-label">stars today</div>
+                <div class="metric-desc">Managed agents platform. Teams are treating agents like coworkers now.</div>
+              </div>
+            </div>
+
+            <div class="row-two">
+              <div class="metric-card">
+                <div class="metric-top">
+                  <div class="metric-name">Archon</div>
+                  <div class="metric-tag">TypeScript</div>
+                </div>
+                <div class="metric-stars">756</div>
+                <div class="metric-label">stars today</div>
+                <div class="metric-desc">Harness builder for deterministic, repeatable AI coding workflows.</div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-top">
+                  <div class="metric-name">markitdown</div>
+                  <div class="metric-tag">Python</div>
+                </div>
+                <div class="metric-stars">2,352</div>
+                <div class="metric-label">stars today</div>
+                <div class="metric-desc">Not an agent itself, but a crucial input layer for doc-to-agent pipelines.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="sl-source">Also trending / rowboat / 507 stars today</div>
+            <div class="sl-page">
+              <div class="sl-page-bar"><div class="sl-page-fill" style="width:25%"></div></div>
+              <span>02 / 08</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide tone-sky" data-index="3">
+          <div class="sl-meta">
+            <div class="sl-kicker"><strong>Hacker News</strong> front page</div>
+            <div class="sl-date">Conversation check</div>
+          </div>
+
+          <div class="sl-top">
+            <h2 class="sl-hero" style="font-size:45px; max-width:430px;">HN is talking about agents in production, not just demos.</h2>
+            <div class="sl-accent-line"></div>
+          </div>
+
+          <div class="sl-body stack">
+            <div class="hn-card">
+              <div class="hn-chip">
+                <strong>212</strong>
+                <span>points</span>
+              </div>
+              <div>
+                <div class="hn-title">AI assistance when contributing to the Linux kernel</div>
+                <div class="hn-meta">146 comments</div>
+                <div class="note-desc">That means the discussion moved from “can AI code?” to “how do we use it responsibly in serious systems?”</div>
+              </div>
+            </div>
+
+            <div class="hn-card">
+              <div class="hn-chip">
+                <strong>61</strong>
+                <span>points</span>
+              </div>
+              <div>
+                <div class="hn-title">Launch HN: Twill.ai — delegate to cloud agents, get back PRs</div>
+                <div class="hn-meta">55 comments</div>
+                <div class="note-desc">The startup pitch is no longer “chat with AI”. It is “ship work, get pull requests back”.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="sl-source">HN snapshot / 11 Apr 2026 / front page data</div>
+            <div class="sl-page">
+              <div class="sl-page-bar"><div class="sl-page-fill" style="width:37.5%"></div></div>
+              <span>03 / 08</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide tone-peach" data-index="4">
+          <div class="sl-meta">
+            <div class="sl-kicker"><strong>Why now</strong> the shift</div>
+            <div class="sl-date">3 reasons</div>
+          </div>
+
+          <div class="sl-top">
+            <h2 class="sl-hero" style="font-size:44px; max-width:420px;">Why this wave matters more than the last one</h2>
+            <div class="sl-accent-line"></div>
+          </div>
+
+          <div class="sl-body stack">
+            <div class="map-card">
+              <div class="map-num">01</div>
+              <div>
+                <div class="map-title">Answers → Actions</div>
+                <div class="map-desc">The win is no longer text output. The win is concrete work products: PRs, docs, patches, and workflow runs.</div>
+              </div>
+            </div>
+
+            <div class="map-card">
+              <div class="map-num">02</div>
+              <div>
+                <div class="map-title">Prompts → Harnesses</div>
+                <div class="map-desc">Projects like Archon are trending because teams want repeatable systems, not magic one-off prompts.</div>
+              </div>
+            </div>
+
+            <div class="map-card">
+              <div class="map-num">03</div>
+              <div>
+                <div class="map-title">Solo bots → Team workflows</div>
+                <div class="map-desc">Multica, rowboat, and Twill all point toward agent orchestration, ownership, and review loops.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="sl-source">Theme / agents are becoming part of the delivery stack</div>
+            <div class="sl-page">
+              <div class="sl-page-bar"><div class="sl-page-fill" style="width:50%"></div></div>
+              <span>04 / 08</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide tone-sand" data-index="5">
+          <div class="sl-meta">
+            <div class="sl-kicker"><strong>Stack map</strong> what each layer does</div>
+            <div class="sl-date">Simple mental model</div>
+          </div>
+
+          <div class="sl-top">
+            <h2 class="sl-hero" style="font-size:44px; max-width:430px;">Think of the agent stack in four layers</h2>
+            <div class="sl-accent-line"></div>
+          </div>
+
+          <div class="sl-body stack">
+            <div class="note-card">
+              <div class="metric-name" style="font-size:24px; margin-bottom:6px;">Input layer</div>
+              <div class="note-desc"><strong>markitdown</strong> helps convert messy files into Markdown so agents can actually reason over them.</div>
+            </div>
+
+            <div class="note-card">
+              <div class="metric-name" style="font-size:24px; margin-bottom:6px;">Harness layer</div>
+              <div class="note-desc"><strong>Archon</strong> is about deterministic, testable AI coding flows instead of ad-hoc prompting.</div>
+            </div>
+
+            <div class="note-card">
+              <div class="metric-name" style="font-size:24px; margin-bottom:6px;">Agent layer</div>
+              <div class="note-desc"><strong>hermes-agent</strong> and <strong>rowboat</strong> represent execution, memory, and autonomous task work.</div>
+            </div>
+
+            <div class="note-card">
+              <div class="metric-name" style="font-size:24px; margin-bottom:6px;">Team layer</div>
+              <div class="note-desc"><strong>multica</strong> and <strong>Twill</strong> frame agents as teammates that accept tasks and return artifacts.</div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="sl-source">Best takeaway / different repos are solving different layers of the same problem</div>
+            <div class="sl-page">
+              <div class="sl-page-bar"><div class="sl-page-fill" style="width:62.5%"></div></div>
+              <span>05 / 08</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide tone-mint" data-index="6">
+          <div class="sl-meta">
+            <div class="sl-kicker"><strong>Reality check</strong> still true</div>
+            <div class="sl-date">Do not skip this</div>
+          </div>
+
+          <div class="sl-top">
+            <h2 class="sl-hero" style="font-size:44px; max-width:420px;">Agents are useful now. They are still not magic.</h2>
+            <div class="sl-accent-line"></div>
+          </div>
+
+          <div class="sl-body checklist">
+            <div class="check-item">
+              <div class="check-icon">◎</div>
+              <div>
+                <div class="check-title">Specs still matter</div>
+                <div class="check-desc">Bad task definitions still create bad output, just faster and at larger scale.</div>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <div class="check-icon">✓</div>
+              <div>
+                <div class="check-title">Review is non-negotiable</div>
+                <div class="check-desc">HN kernel discussion is a reminder: trust comes from review loops, not from vibes.</div>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <div class="check-icon">∞</div>
+              <div>
+                <div class="check-title">Memory can drift</div>
+                <div class="check-desc">Long-running agents need context discipline, guardrails, and resets.</div>
+              </div>
+            </div>
+
+            <div class="check-item">
+              <div class="check-icon">$</div>
+              <div>
+                <div class="check-title">Ops cost is real</div>
+                <div class="check-desc">Retries, model usage, tool integrations, and debugging overhead all add up.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="sl-source">Shortcut / treat agents like junior automation with better language, not perfect engineers</div>
+            <div class="sl-page">
+              <div class="sl-page-bar"><div class="sl-page-fill" style="width:75%"></div></div>
+              <span>06 / 08</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide tone-sky" data-index="7">
+          <div class="sl-meta">
+            <div class="sl-kicker"><strong>Who should test</strong> this week</div>
+            <div class="sl-date">Action list</div>
+          </div>
+
+          <div class="sl-top">
+            <h2 class="sl-hero" style="font-size:44px; max-width:420px;">Four teams that should not ignore this trend</h2>
+            <div class="sl-accent-line"></div>
+          </div>
+
+          <div class="sl-body persona-grid">
+            <div class="persona-card">
+              <div class="persona-title">Solo builders</div>
+              <div class="persona-desc">Use agents for doc cleanup, code migrations, and repetitive setup work.</div>
+            </div>
+
+            <div class="persona-card">
+              <div class="persona-title">Startup engineers</div>
+              <div class="persona-desc">Best fit: test writing, internal tooling, integration glue, and issue triage.</div>
+            </div>
+
+            <div class="persona-card">
+              <div class="persona-title">Dev tools teams</div>
+              <div class="persona-desc">Build internal harnesses early. The moat is workflow reliability, not just model access.</div>
+            </div>
+
+            <div class="persona-card">
+              <div class="persona-title">Open source maintainers</div>
+              <div class="persona-desc">Great for contributor assist, but only with tight review and scope boundaries.</div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="sl-source">If your work has repeatable steps, an agent pilot is already worth running</div>
+            <div class="sl-page">
+              <div class="sl-page-bar"><div class="sl-page-fill" style="width:87.5%"></div></div>
+              <span>07 / 08</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide tone-peach" data-index="8">
+          <div class="sl-meta">
+            <div class="sl-kicker"><strong>Final read</strong> save this</div>
+            <div class="sl-date">What to watch</div>
+          </div>
+
+          <div class="sl-body" style="justify-content:center;">
+            <div class="cta-panel">
+              <h2 class="cta-title">The next edge is not using AI.<br>It is knowing where agents fit.</h2>
+              <div class="cta-text">Save this deck if you want a clean mental model for the current wave. Watch the repos that are turning AI from output into execution.</div>
+              <div class="watch-row">
+                <div class="watch-chip">hermes-agent</div>
+                <div class="watch-chip">Archon</div>
+                <div class="watch-chip">multica</div>
+                <div class="watch-chip">rowboat</div>
+                <div class="watch-chip">markitdown</div>
+                <div class="watch-chip">Twill.ai</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sl-footer">
+            <div class="sl-source">Built from live GitHub Trending + Hacker News signals on 11 Apr 2026</div>
+            <div class="sl-page">
+              <div class="sl-page-bar"><div class="sl-page-fill" style="width:100%"></div></div>
+              <span>08 / 08</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="cr-nav">
+      <button class="cr-nav-btn" id="prev" onclick="navigate(-1)" aria-label="Previous slide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f2430" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="cr-dots" id="dots"></div>
+      <button class="cr-nav-btn" id="next" onclick="navigate(1)" aria-label="Next slide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f2430" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <div class="export-root" id="exportRoot" aria-hidden="true"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    const total = 8;
+    let cur = 0;
+    let isExporting = false;
+
+    const exportStatus = document.getElementById('exportStatus');
+    const exportRoot = document.getElementById('exportRoot');
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    const phone = document.getElementById('phone');
+    const slides = [...document.querySelectorAll('.slide')];
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const dotsEl = document.getElementById('dots');
+
+    for (let i = 0; i < total; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'cr-dot' + (i === 0 ? ' on' : '');
+      dot.onclick = () => goTo(i);
+      dot.style.cursor = 'pointer';
+      dotsEl.appendChild(dot);
+    }
+
+    function setNavState() {
+      prevBtn.disabled = cur === 0;
+      nextBtn.disabled = cur === total - 1;
+    }
+
+    function syncQueryParam() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('slide', String(cur + 1));
+      window.history.replaceState({}, '', url);
+    }
+
+    function goTo(n, options = {}) {
+      const { animate = true, updateQuery = true } = options;
+      if (n === cur && slides[cur].classList.contains('active')) {
+        if (updateQuery) syncQueryParam();
+        return;
+      }
+
+      if (animate) {
+        slides[cur].classList.remove('active');
+        slides[cur].classList.add('exit');
+        setTimeout(() => slides[cur].classList.remove('exit'), 380);
+      } else {
+        slides[cur].classList.remove('active', 'exit');
+      }
+
+      cur = n;
+      slides[cur].classList.add('active');
+      document.querySelectorAll('.cr-dot').forEach((dot, index) => {
+        dot.className = 'cr-dot' + (index === cur ? ' on' : '');
+      });
+      setNavState();
+      if (updateQuery) syncQueryParam();
+    }
+
+    function navigate(dir) {
+      const nextIndex = cur + dir;
+      if (nextIndex >= 0 && nextIndex < total) goTo(nextIndex);
+    }
+
+    function setStatus(message) {
+      exportStatus.textContent = message || '';
+    }
+
+    function initializeFromQuery() {
+      const url = new URL(window.location.href);
+      const slideParam = Number(url.searchParams.get('slide'));
+      if (Number.isInteger(slideParam) && slideParam >= 1 && slideParam <= total) {
+        goTo(slideParam - 1, { animate: false, updateQuery: false });
+      } else {
+        syncQueryParam();
+      }
+    }
+
+    function downloadBlob(blob, fileName) {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = fileName;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    async function renderSlideToBlob(slide, index) {
+      exportRoot.replaceChildren();
+
+      const frame = document.createElement('div');
+      frame.className = 'export-frame';
+
+      const clone = slide.cloneNode(true);
+      clone.classList.remove('exit');
+      clone.classList.add('active');
+      frame.appendChild(clone);
+      exportRoot.appendChild(frame);
+
+      await document.fonts.ready;
+
+      const canvas = await html2canvas(frame, {
+        backgroundColor: null,
+        useCORS: true,
+        scale: Number(getComputedStyle(document.documentElement).getPropertyValue('--ig-export-scale')) || 2,
+        width: frame.clientWidth,
+        height: frame.clientHeight,
+        logging: false
+      });
+
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('PNG export failed for slide ' + (index + 1)));
+            return;
+          }
+          resolve(blob);
+        }, 'image/png');
+      });
+    }
+
+    async function downloadAllSlides() {
+      if (isExporting) return;
+      if (!window.html2canvas || !window.JSZip) {
+        setStatus('Export libraries failed to load. Refresh once and try again.');
+        return;
+      }
+
+      isExporting = true;
+      downloadAllBtn.disabled = true;
+      setStatus('Preparing 8 carousel slides...');
+
+      try {
+        const zip = new JSZip();
+
+        for (let i = 0; i < slides.length; i++) {
+          setStatus(`Rendering slide ${i + 1} of ${slides.length}...`);
+          const blob = await renderSlideToBlob(slides[i], i);
+          zip.file(`ai-coding-agents-signal-slide-${String(i + 1).padStart(2, '0')}.png`, blob);
+        }
+
+        exportRoot.replaceChildren();
+        setStatus('Compressing PNG set...');
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        downloadBlob(zipBlob, 'ai-coding-agents-signal-carousel.zip');
+        setStatus('PNG set downloaded.');
+      } catch (error) {
+        console.error(error);
+        setStatus('Export failed. Open the file in a browser with internet access and try again.');
+      } finally {
+        isExporting = false;
+        downloadAllBtn.disabled = false;
+        exportRoot.replaceChildren();
+      }
+    }
+
+    setNavState();
+    initializeFromQuery();
+
+    let startX = 0;
+    phone.addEventListener('touchstart', (event) => {
+      startX = event.touches[0].clientX;
+    }, { passive: true });
+
+    phone.addEventListener('touchend', (event) => {
+      const deltaX = event.changedTouches[0].clientX - startX;
+      if (Math.abs(deltaX) > 40) navigate(deltaX < 0 ? 1 : -1);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') navigate(1);
+      if (event.key === 'ArrowLeft') navigate(-1);
+    });
+  </script>
+</body>
+</html>
