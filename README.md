@@ -6,6 +6,10 @@ This repo takes a `.html` file with `.slide` sections, compiles it into a [Hyper
 
 No paid video API. No hosted render dependency. Just HTML in, reel out.
 
+[![MIT License](https://img.shields.io/badge/license-MIT-0f172a.svg)](./LICENSE)
+[![Local Render](https://img.shields.io/badge/render-local-0ea5e9.svg)](./README.md)
+[![Output](https://img.shields.io/badge/output-vertical%20MP4-f59e0b.svg)](./README.md)
+
 ## Demo
 
 **Sample reel:** [`create_html_to_reel_carousel_reel.mp4`](./html-carousel/create_html_to_reel_carousel_reel.mp4)
@@ -19,6 +23,25 @@ More demo frames:
 | Build flow | Creator slide | Final CTA |
 | --- | --- | --- |
 | ![Build flow](./docs/demo/demo-flow.png) | ![Creator slide](./docs/demo/demo-creator.png) | ![Final CTA](./docs/demo/demo-cta.png) |
+
+## Try This Example First
+
+Clone the repo, install once, and render the starter reel:
+
+```bash
+git clone https://github.com/radhakishan404/html-carousel-reel.git
+cd html-carousel-reel
+npm install
+./render-reel ./html-carousel/create_html_to_reel_carousel.html \
+  --prompt "smooth, cinematic, storytelling" \
+  --quality standard
+```
+
+Output:
+
+```text
+html-carousel/create_html_to_reel_carousel_reel.mp4
+```
 
 ## What This Repo Does
 
@@ -65,6 +88,16 @@ Output:
 ```text
 html-carousel/create_html_to_reel_carousel_reel.mp4
 ```
+
+## Examples
+
+Use these sample files to test different storytelling styles quickly:
+
+| HTML source | Reel output | Use case |
+| --- | --- | --- |
+| [`create_html_to_reel_carousel.html`](./html-carousel/create_html_to_reel_carousel.html) | [`create_html_to_reel_carousel_reel.mp4`](./html-carousel/create_html_to_reel_carousel_reel.mp4) | Full creator-facing flagship demo |
+| [`local_html_to_reel_launch_carousel.html`](./html-carousel/local_html_to_reel_launch_carousel.html) | [`local_html_to_reel_launch_carousel_reel.mp4`](./html-carousel/local_html_to_reel_launch_carousel_reel.mp4) | Short launch reel focused on the local workflow |
+| [`claude_html_to_reel_workflow_carousel.html`](./html-carousel/claude_html_to_reel_workflow_carousel.html) | [`claude_html_to_reel_workflow_carousel_reel.mp4`](./html-carousel/claude_html_to_reel_workflow_carousel_reel.mp4) | Claude-to-HTML-to-reel workflow demo |
 
 ## Input Format
 
@@ -155,6 +188,16 @@ This repo exists for creators who want:
 - source-controlled visual storytelling
 - no pay-per-render tooling
 - reusable HTML-based creative assets
+
+## Launch Copy
+
+Ready-to-post launch copy lives in [`docs/launch/launch-copy.md`](./docs/launch/launch-copy.md) for:
+
+- X
+- LinkedIn
+- Reddit
+- Instagram
+- pinned comments
 
 ## Contributing
 
