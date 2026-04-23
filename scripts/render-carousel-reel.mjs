@@ -320,15 +320,40 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
       }
 
       function collectWordTargets() {
+        const recordSelector = [
+          ".metric-card",
+          ".stat-card",
+          ".note-card",
+          ".map-card",
+          ".plan-card",
+          ".persona-card",
+          ".hn-card",
+          ".check-item",
+          ".command-box",
+          ".sl-note",
+          ".repo-strip",
+          ".avatar-wrap",
+          ".watch-chip",
+          ".chip",
+          ".pill",
+          ".tip-list li",
+          ".code-block",
+          ".copy-section"
+        ].join(",");
         const textLike = frame.querySelectorAll(
           "h1,h2,h3,h4,.sl-hero,.cta-title,.s1-headline,.s-val-title,.map-title,.hn-title,.persona-title,.metric-name,.metric-stars,.check-title,.sl-copy,.cta-text,.watch-chip"
         );
         const words = [];
         textLike.forEach((el) => {
           if (el.closest("svg,pre,code")) return;
+          if (el.closest(recordSelector)) return;
           words.push(...splitWords(el));
         });
         return words.slice(0, 180);
+      }
+
+      function uniqueElements(nodes) {
+        return Array.from(new Set(Array.from(nodes))).filter(Boolean);
       }
 
       function parseCounterText(text) {
@@ -353,14 +378,19 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
       const blockDuration = (0.46 + (style.motion - 1) * 0.05) * style.pace;
       const wordDuration = (0.36 + (style.motion - 1) * 0.04) * style.pace;
 
-      const blocks = frame.querySelectorAll(
-        ".sl-meta,.sl-top,.sl-body,.sl-footer,.metric-card,.note-card,.map-card,.persona-card,.hn-card,.check-item,.cta-panel,.watch-chip,.pill,.tip-list li,.code-block,.copy-section,.s1-badge,.s1-sub"
+      const primaryBlocks = frame.querySelectorAll(
+        ".sl-meta,.sl-top,.sl-footer,.s1-badge,.s1-sub"
+      );
+      const recordItems = uniqueElements(
+        frame.querySelectorAll(
+          ".metric-card,.stat-card,.note-card,.map-card,.plan-card,.persona-card,.hn-card,.check-item,.command-box,.sl-note,.repo-strip,.avatar-wrap,.watch-chip,.chip,.pill,.tip-list li,.code-block,.copy-section"
+        )
       );
       const bars = frame.querySelectorAll(".sl-accent-line,.s-val-accent-bar,.sl-page-fill,.sl-progress-fill");
       const words = collectWordTargets();
       const lights = frame.querySelectorAll(".hf-light");
       const counters = frame.querySelectorAll(".metric-stars,.hn-chip strong,.map-num,.s1-number,.sl-page span,.slide-counter");
-      const chips = frame.querySelectorAll(".watch-chip,.pill,.tip-icon,.check-icon,.sl-kicker,.sl-date");
+      const iconBits = frame.querySelectorAll(".tip-icon,.check-icon,.sl-kicker,.sl-date");
 
       tl.fromTo(
         frame,
@@ -403,10 +433,10 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
         );
       }
 
-      if (blocks.length) {
+      if (primaryBlocks.length) {
         tl.from(
-          blocks,
-          { opacity: 0, y: 22 * style.motion, filter: "blur(6px)", duration: blockDuration, stagger: style.blockStagger, ease: "power2.out" },
+          primaryBlocks,
+          { opacity: 0, y: 18 * style.motion, filter: "blur(5px)", duration: blockDuration, stagger: style.blockStagger, ease: "power2.out" },
           0.14
         );
       }
@@ -427,12 +457,28 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
         );
       }
 
-      if (chips.length) {
+      if (recordItems.length) {
+        tl.from(
+          recordItems,
+          {
+            opacity: 0,
+            y: 28 * style.motion,
+            scale: 0.965,
+            filter: "blur(7px)",
+            duration: blockDuration,
+            stagger: Math.max(0.13, style.blockStagger * 4.2),
+            ease: "power2.out",
+          },
+          0.58 * style.pace
+        );
+      }
+
+      if (iconBits.length) {
         tl.fromTo(
-          chips,
-          { scale: 0.92, opacity: 0.5 },
-          { scale: 1, opacity: 1, duration: 0.34 * style.pace, stagger: 0.02, ease: "back.out(1.6)" },
-          0.28
+          iconBits,
+          { scale: 0.9, opacity: 0.45 },
+          { scale: 1, opacity: 1, duration: 0.3 * style.pace, stagger: 0.035, ease: "back.out(1.6)" },
+          0.74 * style.pace
         );
       }
 
@@ -441,7 +487,10 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
         if (!parsed) return;
         const isDecimal = !Number.isInteger(parsed.value);
         const state = { n: 0 };
-        const startAt = 0.27 + idx * 0.04;
+        const recordIndex = recordItems.findIndex((item) => item.contains(el));
+        const startAt = recordIndex >= 0
+          ? 0.66 * style.pace + recordIndex * Math.max(0.13, style.blockStagger * 4.2)
+          : 0.32 + idx * 0.05;
         tl.to(
           state,
           {
