@@ -201,6 +201,7 @@ function deriveStyleSpec(prompt) {
   const spec = {
     profile: "balanced",
     motion: 1,
+    pace: 1,
     lights: 0.85,
     wordStagger: 0.012,
     blockStagger: 0.03,
@@ -217,6 +218,7 @@ function deriveStyleSpec(prompt) {
   if (has(["fast", "energetic", "punchy", "viral", "snappy"])) {
     spec.profile = "energetic";
     spec.motion += 0.28;
+    spec.pace -= 0.12;
     spec.wordStagger *= 0.72;
     spec.blockStagger *= 0.78;
     spec.enterYOffset += 8;
@@ -237,6 +239,7 @@ function deriveStyleSpec(prompt) {
   if (has(["minimal", "clean", "subtle", "simple"])) {
     spec.profile = "minimal";
     spec.motion -= 0.2;
+    spec.pace += 0.1;
     spec.lights -= 0.4;
     spec.enterBlur -= 3;
     spec.exitBlur -= 2;
@@ -246,9 +249,19 @@ function deriveStyleSpec(prompt) {
 
   if (has(["soft", "smooth", "elegant"])) {
     spec.motion -= 0.14;
+    spec.pace += 0.12;
     spec.enterBlur -= 2;
     spec.exitBlur -= 1;
     spec.wordStagger *= 1.16;
+  }
+
+  if (has(["slow", "presentation", "voiceover", "narration", "storytelling", "calm"])) {
+    spec.profile = spec.profile === "balanced" ? "presentation" : spec.profile;
+    spec.motion -= 0.2;
+    spec.pace += 0.26;
+    spec.wordStagger *= 1.28;
+    spec.blockStagger *= 1.22;
+    spec.lights -= 0.08;
   }
 
   if (has(["dramatic", "bold", "aggressive", "hard"])) {
@@ -259,6 +272,7 @@ function deriveStyleSpec(prompt) {
   }
 
   spec.motion = clamp(spec.motion, 0.7, 1.8);
+  spec.pace = clamp(spec.pace, 0.8, 1.6);
   spec.lights = clamp(spec.lights, 0, 1.6);
   spec.wordStagger = clamp(spec.wordStagger, 0.006, 0.03);
   spec.blockStagger = clamp(spec.blockStagger, 0.014, 0.06);
@@ -277,7 +291,7 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
       const frame = document.getElementById("${frameId}");
       const duration = ${secondsPerSlide};
       const style = ${styleJson};
-      const exitStart = Math.max(0.35, duration - 0.38);
+      const exitStart = Math.max(0.6, duration - 0.6 * style.pace);
 
       function splitWords(el) {
         if (!el || el.hasAttribute("data-hf-split")) return [];
@@ -335,9 +349,9 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
 
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
-      const enterDuration = 0.4 + (style.motion - 1) * 0.08;
-      const blockDuration = 0.42 + (style.motion - 1) * 0.05;
-      const wordDuration = 0.32 + (style.motion - 1) * 0.04;
+      const enterDuration = (0.42 + (style.motion - 1) * 0.08) * style.pace;
+      const blockDuration = (0.46 + (style.motion - 1) * 0.05) * style.pace;
+      const wordDuration = (0.36 + (style.motion - 1) * 0.04) * style.pace;
 
       const blocks = frame.querySelectorAll(
         ".sl-meta,.sl-top,.sl-body,.sl-footer,.metric-card,.note-card,.map-card,.persona-card,.hn-card,.check-item,.cta-panel,.watch-chip,.pill,.tip-list li,.code-block,.copy-section,.s1-badge,.s1-sub"
@@ -375,7 +389,7 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
         tl.fromTo(
           lights[2],
           { opacity: 0, xPercent: 0, yPercent: 70 },
-          { opacity: 0.45 * style.lights, xPercent: 0, yPercent: -85, duration: duration * 0.76, ease: "sine.inOut" },
+          { opacity: 0.32 * style.lights, xPercent: 0, yPercent: -68, duration: duration * 0.7, ease: "sine.inOut" },
           0.15
         );
       }
@@ -417,7 +431,7 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
         tl.fromTo(
           chips,
           { scale: 0.92, opacity: 0.5 },
-          { scale: 1, opacity: 1, duration: 0.32, stagger: 0.02, ease: "back.out(1.7)" },
+          { scale: 1, opacity: 1, duration: 0.34 * style.pace, stagger: 0.02, ease: "back.out(1.6)" },
           0.28
         );
       }
@@ -432,7 +446,7 @@ function buildSlideAnimationScript(frameId, slideCompId, secondsPerSlide, styleS
           state,
           {
             n: parsed.value,
-            duration: Math.min(0.95, Math.max(0.45, duration * 0.42)),
+            duration: Math.min(1.85, Math.max(0.6, duration * 0.5)),
             ease: "power2.out",
             onUpdate: () => {
               el.textContent = parsed.prefix + formatNumber(state.n, isDecimal) + parsed.suffix;
@@ -640,7 +654,7 @@ ${styles
       .hf-light {
         position: absolute;
         pointer-events: none;
-        mix-blend-mode: screen;
+        mix-blend-mode: soft-light;
         opacity: 0;
         z-index: 40;
         will-change: transform, opacity;
@@ -668,12 +682,12 @@ ${styles
 
       .hf-light-c {
         width: 130%;
-        height: 24%;
+        height: 12%;
         left: -15%;
-        top: 36%;
+        top: 44%;
         border-radius: 999px;
-        background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.34), rgba(255,255,255,0));
-        filter: blur(9px);
+        background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.2), rgba(255,255,255,0));
+        filter: blur(6px);
       }
 
       .source-stage {
