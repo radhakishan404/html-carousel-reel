@@ -93,11 +93,11 @@ html-carousel/create_html_to_reel_carousel_reel.mp4
 
 Use these sample files to test different storytelling styles quickly:
 
-| HTML source | Reel output | Use case |
+| HTML source | Included demo output | Use case |
 | --- | --- | --- |
 | [`create_html_to_reel_carousel.html`](./html-carousel/create_html_to_reel_carousel.html) | [`create_html_to_reel_carousel_reel.mp4`](./html-carousel/create_html_to_reel_carousel_reel.mp4) | Full creator-facing flagship demo |
-| [`local_html_to_reel_launch_carousel.html`](./html-carousel/local_html_to_reel_launch_carousel.html) | [`local_html_to_reel_launch_carousel_reel.mp4`](./html-carousel/local_html_to_reel_launch_carousel_reel.mp4) | Short launch reel focused on the local workflow |
-| [`claude_html_to_reel_workflow_carousel.html`](./html-carousel/claude_html_to_reel_workflow_carousel.html) | [`claude_html_to_reel_workflow_carousel_reel.mp4`](./html-carousel/claude_html_to_reel_workflow_carousel_reel.mp4) | Claude-to-HTML-to-reel workflow demo |
+| [`local_html_to_reel_launch_carousel.html`](./html-carousel/local_html_to_reel_launch_carousel.html) | Not tracked | Short launch reel focused on the local workflow |
+| [`claude_html_to_reel_workflow_carousel.html`](./html-carousel/claude_html_to_reel_workflow_carousel.html) | Not tracked | Claude-to-HTML-to-reel workflow demo |
 
 ## Input Format
 
